@@ -1,0 +1,6 @@
+#パイプライン使用時のセットアップ
+import sys
+sys.path.append("/content/drive/My Drive/Pipeline")
+output_dir = "/content/drive/My Drive/Pipeline/output_dir"
+
+#__pycache__フォルダは勝手に生成される
