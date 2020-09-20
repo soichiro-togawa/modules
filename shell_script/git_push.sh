@@ -11,9 +11,9 @@ expect \"Username\"
 send \"${UN}\n\"
 expect \"Password\"
 send \"${PW}\n\"
-expect \"\\\$\"
-exit 0
+# expect \"\\\$\"
+# exit 0
 "
-
+interact
 #使い方
 # "/mnt/d/Google ドライブ/Pipeline/shell_script/git_push.sh"
