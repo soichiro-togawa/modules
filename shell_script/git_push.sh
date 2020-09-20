@@ -6,12 +6,14 @@ git commit -m "script_push"
 
 expect -c "
 set timeout 5
+#expectするコマンド
 spawn git push origin master
 expect \"Username\"
 send \"${UN}\n\"
 expect \"Password\"
 send \"${PW}\n\"
 interact
+#interactの変わり↓
 # expect \"\\\$\"
 # exit 0
 "
