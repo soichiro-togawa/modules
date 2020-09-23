@@ -187,7 +187,7 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
     return oof
 
 def oof_tocsv(oof_temp):
-    oof_temp = pd.Series(oof.reshape(-1,))
+    oof_temp = pd.Series(oof_temp.reshape(-1,))
     oof_temp.to_csv(oof_path + "oof_{}.csv".format(model_name), index=False)
 
 def run(df_train, df_test, imfolder_train, imfolder_val):

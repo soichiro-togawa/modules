@@ -75,8 +75,8 @@ def main(df_test, imfolder_test):
     preds /= skf.n_splits
     return preds
     
-def predict_tocsv(df_sub, preds_temp):
-    df_sub[target] = preds_temp.cpu().numpy().reshape(-1,)
+def predict_tocsv(df_sub, predict_temp):
+    df_sub[target] = predict_temp.cpu().numpy().reshape(-1,)
     df_sub.to_csv(predict_path + "predict_{}.csv".format(model_name), index=False)
 
 def run(df_test,df_sub,imfolder_test):
