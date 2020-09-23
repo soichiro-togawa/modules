@@ -33,7 +33,6 @@ def print_config():
     print("batch_size",batch_size)
     print("num_workers",num_workers)
     print("kfold",kfold)
-    print("save_path",save_path)
     print("target",target)
     print("test_aug",test_aug)
     print("TTA",TTA)
@@ -53,7 +52,7 @@ def main(df_test, imfolder_test):
     preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
     for fold in range(kfold):
         print('=' * 20, 'Fold', fold, '=' * 20)
-        model_path = save_path + f'model_fold_{fold}.pth'
+        model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)
         
         test_dataset = Albu_Dataset(df=df_test,
                        imfolder=imfolder_test,
@@ -62,7 +61,7 @@ def main(df_test, imfolder_test):
                        aug=test_aug) #ForTTA
         test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
-        model = torch.load(model_path)
+        model = torch.load(model_path_fold)
         model.eval()
         tta_preds = torch.zeros((len(test_dataset), 1), dtype=torch.float32, device=device)
         for _ in range(TTA):
