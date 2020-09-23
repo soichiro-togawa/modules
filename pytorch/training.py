@@ -2,15 +2,13 @@
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform
 import torch
-# import torchvision
 import torch.nn.functional as F
 import torch.nn as nn
-# import torchtoolbox.transform as transforms
-from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from efficientnet_pytorch import EfficientNet
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
-from sklearn.model_selection import StratifiedKFold, GroupKFold, KFold
+from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
 import time, datetime, warnings
@@ -29,13 +27,12 @@ es_patience = config.es_patience
 batch_size = config.batch_size
 num_workers = config.num_workers
 kfold = config.kfold
-save_path = config.save_path
 b_num = config.b_num
 train_aug, val_aug = config.train_aug, config.val_aug
-if DEBUG == True:
-  epochs = 2
-  kfold = 2
-  save_path = save_path + "_DEBUG"
+model_name = config.model_name
+model_path = config.model_path
+predict_path = config.predict_path
+oof_path = config.oof_path
 
 def print_config():
     print("DEBUG",DEBUG)
@@ -48,6 +45,11 @@ def print_config():
     print("save_path",save_path)
     print("b_num",b_num)
     print("train_aug,val_aug",train_aug,val_aug)
+    print("--------path----------")
+    print("model_name",model_name)
+    print("model_path",model_path)
+    print("predict_path",predict_path)
+    print("oof_path",oof_path)
     if DEBUG==True:
       print("#########DEBUG-MODE#############")
 print_config()
@@ -61,7 +63,7 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
     skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
     for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train['target'])):
         print('=' * 20, 'Fold', fold, '=' * 20)
-        model_path = save_path + f'model_fold_{fold}.pth'  # Path and filename to save model to
+        model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
         best_val = 0  # Best validation score within this fold
         patience = es_patience  # Current patience counter
 
@@ -163,14 +165,14 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 if val_roc >= best_val:
                     best_val = val_roc
                     patience = es_patience  # Resetting patience since we have new best validation accuracy
-                    torch.save(model, model_path)  # Saving current best model
+                    torch.save(model, model_path_fold)  # Saving current best model
                 else:
                     patience -= 1
                     if patience == 0:
                         print('Early stopping. Best Val roc_auc: {:.3f}'.format(best_val))
                         break
                     
-        model = torch.load(model_path)  # Loading best model of this fold
+        model = torch.load(model_path_fold)  # Loading best model of this fold
         model.eval()  # switch model to the evaluation mode
         val_preds = torch.zeros((len(val_idx), 1), dtype=torch.float32, device=device)
         with torch.no_grad():
@@ -184,13 +186,24 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
             oof[val_idx] = val_preds.cpu().numpy()
     return oof
 
+def oof_tocsv(oof_temp):
+    oof_temp = pd.Series(oof.reshape(-1,))
+    oof_temp.to_csv(oof_path + "oof_{}.csv".format(model_name), index=False)
+
 def run(df_train, df_test, imfolder_train, imfolder_val):
     from pytorch.seed import seed_everything
     seed_everything(1)
     warnings.simplefilter('ignore')
     oof = main(df_train, df_test, imfolder_train,imfolder_val)
+    oof_tocsv(oof)
     return oof
 
 if __name__ == '__main__':
     run()
 
+#########使用方法##########
+# import importlib
+# from pytorch import training
+# import pytorch.training
+# importlib.reload(pytorch.training)
+# oof = training.run(df_train, df_test,imfolder_train,imfolder_val)
