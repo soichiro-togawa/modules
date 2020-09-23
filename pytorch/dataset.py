@@ -1,8 +1,11 @@
 #データセット
+import numpy as np
+import pandas as pd
+import torch.tensor
 from torch.utils.data import Dataset
 import cv2
 print("クラス一覧")
-print(Albu_Datset,Torch_Dataset)
+print("Albu_Datset","Torch_Dataset")
 
 
 class Albu_Dataset(Dataset):

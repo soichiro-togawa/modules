@@ -5,7 +5,7 @@ import albumentations as A
 
 
 print("クラス一覧")
-print(Albu_Datset,Torch_Dataset)
+print("Albu_Transform","Torch_Transform")
 
 
 class Albu_Transform():
@@ -34,8 +34,8 @@ class Albu_Transform():
               A.Normalize()
               ]),
             'test_transform': A.Compose([
-              # A.Resize(image_size, image_size),
-              # A.Normalize()])
+              A.Resize(image_size, image_size),
+              A.Normalize(),
               A.Resize(image_size, image_size)
               ])}
     def __call__(self, img, aug=True):
@@ -69,3 +69,4 @@ class Torch_Transform():
         if aug == True:
           return self.data_transform["train_transform"](img)
         return self.data_transform["test_transform"](img)
+
