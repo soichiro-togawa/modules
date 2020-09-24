@@ -1,6 +1,7 @@
 #transform
-import torchtoolbox.transform as transforms
+# !pip install efficientnet_pytorch torchtoolbox
 # !pip install albumentations==0.4.6
+import torchtoolbox.transform as transforms
 import albumentations as A
 
 

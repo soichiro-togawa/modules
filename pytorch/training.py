@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
-import time, datetime, warnings
+import time, datetime, warnings,os
 
 
 #コンフィグの読み直し！！
@@ -42,16 +42,18 @@ def print_config():
     print("batch_size",batch_size)
     print("num_workers",num_workers)
     print("kfold",kfold)
-    print("save_path",save_path)
     print("b_num",b_num)
     print("train_aug,val_aug",train_aug,val_aug)
     print("--------path----------")
     print("model_name",model_name)
-    print("model_path",model_path)
-    print("predict_path",predict_path)
-    print("oof_path",oof_path)
+    print("model_path",model_path,os.path.exists(model_path))
+    print("predict_path",predict_path,os.path.exists(predict_path))
+    print("oof_path",oof_path,os.path.exists(oof_path))
     if DEBUG==True:
       print("#########DEBUG-MODE#############")
+      print("model_path",os.path.exists(config.temp_model_path))
+      print("oof_path",os.path.exists(config.temp_oof_path))
+      print("predict_path",os.path.exists(config.temp_predict_path))
 print_config()
 
 
