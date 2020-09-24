@@ -27,6 +27,7 @@ es_patience = config.es_patience
 batch_size = config.batch_size
 num_workers = config.num_workers
 kfold = config.kfold
+target = config.target
 b_num = config.b_num
 train_aug, val_aug = config.train_aug, config.val_aug
 model_name = config.model_name
@@ -56,18 +57,42 @@ def print_config():
       print("model_path",os.path.exists(config.temp_model_path))
       print("oof_path",os.path.exists(config.temp_oof_path))
       print("predict_path",os.path.exists(config.temp_predict_path))
-print_config()
+
+#コンフィグのログ
+def print_config_log(logger):
+    logger.info("#####Print_Config######")
+    logger.info("DEBUG:{}".format(DEBUG))
+    logger.info("image_size:{}".format(image_size))
+    logger.info("epochs:{}".format(epochs))
+    logger.info("es_patience:{}".format(es_patience))
+    logger.info("batch_size:{}".format(batch_size))
+    logger.info("num_workers:{}".format(num_workers))
+    logger.info("kfold:{}".format(kfold))
+    logger.info("b_num:{}".format(b_num))
+    logger.info("train_aug,val_aug:{}".format(train_aug,val_aug))
+    logger.info("--------path----------")
+    logger.info("model_name:{}".format(model_name))
+    logger.info("model_path:{}:{}".format(model_path,os.path.exists(model_path)))
+    logger.info("predict_path:{}:{}".format(predict_path,os.path.exists(predict_path)))
+    logger.info("oof_path:{}:{}".format(oof_path,os.path.exists(oof_path)))
+    if DEBUG==True:
+      logger.info("#########DEBUG-MODE#############")
+      logger.info("model_path:{}".format(os.path.exists(config.temp_model_path)))
+      logger.info("oof_path:{}".format(os.path.exists(config.temp_oof_path)))
+      logger.info("predict_path:{}".format(os.path.exists(config.temp_predict_path)))
+    logger.info("#####END######")
 
 
 def main(df_train, df_test, imfolder_train,imfolder_val):
     logger = setup_logger(LOG_DIR, LOG_NAME)
+    print_config_log(logger)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # print("device_CPU_GPU:", device)
     logger.info("device_CPU_GPU:{}".format(device))
     oof = np.zeros((len(df_train), 1))  # Out Of Fold predictions
     preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
     skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
-    for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train['target'])):
+    for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train[target])):
         # print('=' * 20, 'Fold', fold, '=' * 20)
         logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
@@ -154,8 +179,8 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                     val_pred = torch.sigmoid(output_val)
 
                     val_preds[j*val_loader.batch_size:j*val_loader.batch_size + x_val.shape[0]] = val_pred
-                val_acc = accuracy_score(df_train.iloc[val_idx]['target'].values, torch.round(val_preds.cpu()))
-                val_roc = roc_auc_score(df_train.iloc[val_idx]['target'].values, val_preds.cpu())
+                val_acc = accuracy_score(df_train.iloc[val_idx][target].values, torch.round(val_preds.cpu()))
+                val_roc = roc_auc_score(df_train.iloc[val_idx][target].values, val_preds.cpu())
                 
                 #表示
                 # print('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(

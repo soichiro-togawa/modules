@@ -18,10 +18,10 @@ oof_path = "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/"
 predict_path = "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/"
 #log
 LOG_DIR = "/content/drive/My Drive/Pipeline/output_dir/"
-LOG_NAME = "training_log"
+LOG_NAME = "training_log" + model_name
 
 if DEBUG == True:
-  epochs = 2
+  epochs = 1
   kfold = 2
   TTA = 2
 
@@ -32,4 +32,5 @@ if DEBUG == True:
   model_path =  model_path + "DEBUG_"
   oof_path =  oof_path + "DEBUG_"
   predict_path =  predict_path + "DEBUG_"
+  LOG_DIR =  LOG_DIR + "DEBUG_"
 
