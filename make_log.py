@@ -5,9 +5,15 @@ import os,sys
 
 # LOG_DIR = ""
 
-def setup_logger(LOG_DIR, out_file=None, stderr=True, stderr_level=logging.INFO, file_level=logging.DEBUG):
-    print("ログセットアップ")
+def setup_logger(LOG_DIR, FILE_NAME=None, stderr=True, stderr_level=logging.INFO, file_level=logging.DEBUG):
+    print("ログセットアップ、ログファイルの生成")
     LOGGER = logging.getLogger()
+
+    if not os.path.isdir(LOG_DIR):
+        os.makedirs(LOG_DIR)
+
+    NOW = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d_%H:%M:%S')
+    out_file = LOG_DIR + "{0}_{1}.log".format(FILE_NAME,NOW)
 
     #タイムゾーンを東京にコンバート
     def customTime(*args):
@@ -33,19 +39,20 @@ def setup_logger(LOG_DIR, out_file=None, stderr=True, stderr_level=logging.INFO,
 
     LOGGER.info("logger set up")
 
-    if not os.path.isdir(LOG_DIR):
-        os.makedirs(LOG_DIR)
+
 
     return LOGGER
 
 
 #########使用方法##########
-# #loggerのセットアップ
-# import datetime
-# from pytz import timezone
+# #loggerのセットアップ,一つのlogファイルに次々書き込まれていく方式
 # from make_log import setup_logger
-# file_name = "model_log"
-# LOG_DIR = "/"
-# NOW = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d_%H:%M:%S')
-# logger = setup_logger(LOG_DIR,os.path.join(LOG_DIR,'{0}_{1}.log'.format(file_name,NOW)))
-# logger.info("log:{0}".format("comment"))
+# #DIRがなければ自動作成
+# LOG_DIR = "/content/log/"
+# FILE_NAME = "training_log"
+# logger = setup_logger(LOG_DIR, FILE_NAME)
+# #生成したログファイルへの書き込み
+# COMMENT1 = "comment1"
+# COMMENT2 = "comment2"
+# logger.info("log:{}".format(COMMENT1))
+# logger.info("log:{}".format(COMMENT2))

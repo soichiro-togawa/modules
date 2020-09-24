@@ -12,7 +12,7 @@ from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
 import time, datetime, warnings,os
-
+from make_log import setup_logger
 
 #コンフィグの読み直し！！
 from pytorch import config
@@ -33,6 +33,8 @@ model_name = config.model_name
 model_path = config.model_path
 predict_path = config.predict_path
 oof_path = config.oof_path
+LOG_DIR = config.LOG_DIR
+LOG_NAME = config.LOG_NAME
 
 def print_config():
     print("DEBUG",DEBUG)
@@ -58,13 +60,16 @@ print_config()
 
 
 def main(df_train, df_test, imfolder_train,imfolder_val):
+    logger = setup_logger(LOG_DIR, LOG_NAME)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("device_CPU_GPU:", device)
+    # print("device_CPU_GPU:", device)
+    logger.info("device_CPU_GPU:{}".format(device))
     oof = np.zeros((len(df_train), 1))  # Out Of Fold predictions
     preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
     skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
     for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train['target'])):
-        print('=' * 20, 'Fold', fold, '=' * 20)
+        # print('=' * 20, 'Fold', fold, '=' * 20)
+        logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
         best_val = 0  # Best validation score within this fold
         patience = es_patience  # Current patience counter
@@ -153,7 +158,15 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 val_roc = roc_auc_score(df_train.iloc[val_idx]['target'].values, val_preds.cpu())
                 
                 #表示
-                print('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(
+                # print('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(
+                # epoch + 1, 
+                # epoch_loss, 
+                # train_acc, 
+                # val_acc, 
+                # val_roc, 
+                # str(datetime.timedelta(seconds=time.time() - start_time))[:7]))
+                #ログ抽出
+                logger.info('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(
                 epoch + 1, 
                 epoch_loss, 
                 train_acc, 
@@ -172,6 +185,7 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                     patience -= 1
                     if patience == 0:
                         print('Early stopping. Best Val roc_auc: {:.3f}'.format(best_val))
+                        logger.info('Early stopping. Best Val roc_auc: {:.3f}'.format(best_val))
                         break
                     
         model = torch.load(model_path_fold)  # Loading best model of this fold
