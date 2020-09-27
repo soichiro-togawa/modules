@@ -98,18 +98,6 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
         best_val = 0  # Best validation score within this fold
         patience = es_patience  # Current patience counter
-
-        #モデル定義
-        # in_features = {"b0":1000,"b1":1280,"b2":1408,"b3":1536,"b4":1792,"b5":2048,"b6":2304,"b7":2560}
-        model = EfficientNet.from_pretrained('efficientnet-'+b_num)
-
-        # Unfreeze model weights→凍結せず
-        for param in model.parameters():
-            param.requires_grad = True
-        num_ftrs = model._fc.in_features
-        # print(num_ftrs)
-        model._fc = nn.Linear(in_features=num_ftrs, out_features=1)
-        model = model.to(device)
         
         #オプティマイザー、スケジューラ―、損失関数
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
