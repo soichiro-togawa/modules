@@ -20,4 +20,4 @@ interact
 "
 
 #使い方
-# "/mnt/d/Google ドライブ/Pipeline/shell_script/git_push.sh"
+# "/mnt/d/Google ドライブ/Pipeline/shell_script/git_push_master.sh"

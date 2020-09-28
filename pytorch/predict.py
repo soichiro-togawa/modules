@@ -7,7 +7,7 @@ import warnings,os
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform
-
+from pytorch.model import Ef_Net
 
 #コンフィグの読み直し！！
 from pytorch import config
@@ -63,7 +63,9 @@ def main(df_test, imfolder_test):
         print('=' * 20, 'Fold', fold, '=' * 20)
         test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)
-        model = torch.load(model_path_fold)
+        model = Ef_Net()
+        model.load_state_dict(torch.load(model_path_fold))
+        model = model.to(device)
         model.eval()
         with torch.no_grad():
           tta_predict = torch.zeros((len(test_dataset), 1), dtype=torch.float32, device=device)

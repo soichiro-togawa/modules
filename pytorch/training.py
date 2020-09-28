@@ -21,7 +21,9 @@ from pytorch import config
 import pytorch
 import importlib
 importlib.reload(pytorch.config)
-#emsamble_config
+import pytorch.model
+importlib.reload(pytorch.model)
+#config_import_list
 DEBUG = config.DEBUG
 image_size = config.image_size
 epochs = config.epochs
@@ -71,7 +73,7 @@ def print_config_log(logger):
     logger.info("num_workers:{}".format(num_workers))
     logger.info("kfold:{}".format(kfold))
     logger.info("b_num:{}".format(b_num))
-    logger.info("train_aug,val_aug:{}".format(train_aug,val_aug))
+    logger.info("train_aug,val_aug:{}{}".format(train_aug,val_aug))
     logger.info("--------path----------")
     logger.info("model_name:{}".format(model_name))
     logger.info("model_path:{}:{}".format(model_path,os.path.exists(model_path)))
@@ -100,14 +102,21 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
         best_val = 0  # Best validation score within this fold
         patience = es_patience  # Current patience counter
+
+        #損失関数のセット
+        # criterion = nn.BCEWithLogitsLoss()
+        criterion = nn.BCELoss()
+        # criterion = nn.CrossEntropyLoss()
+        logger.info("criterion:{}".format(str(criterion)))
+
         #モデルクラスの読み込み
         model = Ef_Net()
         model = model.to(device)
-        # logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
-        #オプティマイザー、スケジューラ―、損失関数
+        logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
+
+        #オプティマイザー、スケジューラ―のセット
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=1, verbose=True, factor=0.2)
-        criterion = nn.BCEWithLogitsLoss()
         
         #データセットインスタンスの生成
         train_dataset = Albu_Dataset(df=df_train.iloc[train_idx].reset_index(drop=True), 
@@ -147,7 +156,6 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 output = model(x)
                 #損失(誤差)の計算
                 loss = criterion(output, y.unsqueeze(1))
-                # loss = criterion(output, y)
 
                 #逆伝播
                 #apex2
@@ -157,7 +165,8 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 optimizer.step()
 
                 #予測          
-                pred = torch.round(torch.sigmoid(output))  # round oftain predictionsf sigmoid to ob
+                # pred = torch.round(torch.sigmoid(output))  # round oftain predictionsf sigmoid to ob
+                pred = torch.round(output)  # round oftain predictionsf sigmoid to ob
                 correct += (pred.cpu() == y.cpu().unsqueeze(1)).sum().item()  # tracking number of correctly predicted samples
                 epoch_loss += loss.item()
             train_acc = correct / len(train_idx)
@@ -171,20 +180,13 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                     x_val = torch.tensor(x_val, device=device, dtype=torch.float32)
                     y_val = torch.tensor(y_val, device=device, dtype=torch.float32)
                     output_val = model(x_val)
-                    val_pred = torch.sigmoid(output_val)
+                    # val_pred = torch.sigmoid(output_val)
+                    val_pred = output_val
 
                     val_preds[j*val_loader.batch_size:j*val_loader.batch_size + x_val.shape[0]] = val_pred
                 val_acc = accuracy_score(df_train.iloc[val_idx][target].values, torch.round(val_preds.cpu()))
                 val_roc = roc_auc_score(df_train.iloc[val_idx][target].values, val_preds.cpu())
                 
-                #表示
-                # print('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(
-                # epoch + 1, 
-                # epoch_loss, 
-                # train_acc, 
-                # val_acc, 
-                # val_roc, 
-                # str(datetime.timedelta(seconds=time.time() - start_time))[:7]))
                 #ログ抽出
                 logger.info('Epoch {:03}: | Loss: {:.3f} | Train acc: {:.3f} | Val acc: {:.3f} | Val roc_auc: {:.3f} | Training time: {}'.format(
                 epoch + 1, 
@@ -200,7 +202,7 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 if val_roc >= best_val:
                     best_val = val_roc
                     patience = es_patience  # Resetting patience since we have new best validation accuracy
-                    torch.save(model, model_path_fold)  # Saving current best model
+                    torch.save(model.state_dict(), model_path_fold)  # Saving current best model
                 else:
                     patience -= 1
                     if patience == 0:
@@ -208,8 +210,10 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                         logger.info('Early stopping. Best Val roc_auc: {:.3f}'.format(best_val))
                         break
                     
-        model = torch.load(model_path_fold)  # Loading best model of this fold
-        model.eval()  # switch model to the evaluation mode
+        model = Ef_Net()
+        model.load_state_dict(torch.load(model_path_fold))
+        model = model.to(device)
+        model.eval()
         val_preds = torch.zeros((len(val_idx), 1), dtype=torch.float32, device=device)
         with torch.no_grad():
             # Predicting on validation set once again to obtain data for OOF
@@ -217,7 +221,8 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 x_val = torch.tensor(x_val, device=device, dtype=torch.float32)
                 y_val = torch.tensor(y_val, device=device, dtype=torch.float32)
                 output_val = model(x_val)
-                val_pred = torch.sigmoid(output_val)
+                # val_pred = torch.sigmoid(output_val)
+                val_pred = output_val
                 val_preds[j*val_loader.batch_size:j*val_loader.batch_size + x_val.shape[0]] = val_pred
             oof[val_idx] = val_preds.cpu().numpy()
     return oof
