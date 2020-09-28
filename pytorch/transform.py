@@ -71,3 +71,5 @@ class Torch_Transform():
           return self.data_transform["train_transform"](img)
         return self.data_transform["test_transform"](img)
 
+#########使用方法##########
+# from pytorch.transform import Albu_Transform

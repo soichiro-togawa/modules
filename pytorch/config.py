@@ -1,12 +1,12 @@
 #Config train.pyとpredict.py用
-DEBUG = False
-image_size = 512
+DEBUG = True
+image_size = 256
 epochs = 12  # Number of epochs to run
 es_patience = 3  # Early Stopping patience - for how many epochs with no improvements to wait
 batch_size = 16
 num_workers = 8
 kfold = 5
-b_num = "b7"
+b_num = "b1"
 train_aug,val_aug,test_aug = True,False,True
 target = "target"
 TTA = 12 # Test Time Augmentation rounds

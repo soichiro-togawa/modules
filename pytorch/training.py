@@ -1,6 +1,4 @@
 #トレーニング＋predict oof
-from pytorch.dataset import Albu_Dataset
-from pytorch.transform import Albu_Transform
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -13,6 +11,10 @@ import pandas as pd
 import numpy as np
 import time, datetime, warnings,os
 from make_log import setup_logger
+#自作モジュール
+from pytorch.dataset import Albu_Dataset
+from pytorch.transform import Albu_Transform
+from pytorch.model import Ef_Net
 
 #コンフィグの読み直し！！
 from pytorch import config
@@ -84,21 +86,24 @@ def print_config_log(logger):
 
 
 def main(df_train, df_test, imfolder_train,imfolder_val):
+    #ロガーのセット
     logger = setup_logger(LOG_DIR, LOG_NAME)
     print_config_log(logger)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print("device_CPU_GPU:", device)
     logger.info("device_CPU_GPU:{}".format(device))
     oof = np.zeros((len(df_train), 1))  # Out Of Fold predictions
     preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
     skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
+
     for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train[target])):
-        # print('=' * 20, 'Fold', fold, '=' * 20)
         logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
         model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)  # Path and filename to save model to
         best_val = 0  # Best validation score within this fold
         patience = es_patience  # Current patience counter
-        
+        #モデルクラスの読み込み
+        model = Ef_Net()
+        model = model.to(device)
+        # logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
         #オプティマイザー、スケジューラ―、損失関数
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=1, verbose=True, factor=0.2)
@@ -132,8 +137,10 @@ def main(df_train, df_test, imfolder_train,imfolder_val):
                 # print(x.dtype)
                 #inputのxやlabelのyをcudaに乗せる+tensor,float32型にしている
                 x = torch.tensor(x, device=device, dtype=torch.float32)
+                # print("is_cuda_x",x.is_cuda)
                 # print(x.dtype)
                 y = torch.tensor(y, device=device, dtype=torch.float32)
+                # print("is_cuda_y",y.is_cuda)
             
                 #順伝播
                 optimizer.zero_grad()

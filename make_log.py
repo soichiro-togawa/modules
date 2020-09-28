@@ -6,7 +6,7 @@ import os,sys
 # LOG_DIR = ""
 
 def setup_logger(LOG_DIR, FILE_NAME=None, stderr=True, stderr_level=logging.INFO, file_level=logging.DEBUG):
-    print("ログセットアップ、ログファイルの生成")
+    # print("ログセットアップ、ログファイルの生成")
     LOGGER = logging.getLogger()
 
     if not os.path.isdir(LOG_DIR):

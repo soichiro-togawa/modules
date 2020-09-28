@@ -1,10 +1,11 @@
-#データセット
+#モデル
 import torch.nn as nn
 import torch.tensor
-import pytorch.config
 from efficientnet_pytorch import EfficientNet
+#自作モジュール
+import pytorch.config
 print("クラス一覧")
-print("Ef_Net","Torch_Dataset")
+print("Ef_Net")
 
 #コンフィグの読み直し！！
 from pytorch import config
@@ -19,10 +20,19 @@ class Ef_Net(nn.Module):
         #一度インスタンス化するために、archは変数に入れる必要性？？
         arch = EfficientNet.from_pretrained('efficientnet-'+b_num)
         self.arch = arch
+        # Unfreeze model weights→凍結せず
+        for param in self.arch.parameters():
+            param.requires_grad = True
         #in_features = {"b0":1000,"b1":1280,"b2":1408,"b3":1536,"b4":1792,"b5":2048,"b6":2304,"b7":2560}
         num_ftrs = self.arch._fc.in_features
         self.arch._fc = nn.Linear(in_features=num_ftrs, out_features=1)
-        
+    #self.archで一階層深いところにネットワークを定義しているので、forwardが必須???
+    def forward(self, input):
+      #シグモイドの有無はloss次第
+      output = self.arch(input)
+      return output
+
+    #インスタンスのクラス属性の表示
     def print_attribute(self,key=True,value=True):
       for i, j in self.__dict__.items():
         if key==True and value == True:
@@ -32,9 +42,8 @@ class Ef_Net(nn.Module):
         else:
           print(j)
 
-
-
-    # def model_summary(self):
-    #     # pip install torchsummary
-    #     from torchsummary import summary
-    #     summary(self.arch,(3,256,256)) # summary(model,(channel
+    #モデルサマリーgpuセットしないとエラー吐く??
+    def model_summary(self):
+        # pip install torchsummary
+        from torchsummary import summary
+        summary(self.arch,(3,256,256))

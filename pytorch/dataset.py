@@ -68,3 +68,6 @@ class Torch_Dataset(Dataset):
 
     def __len__(self):
         return len(self.df)
+
+#########使用方法##########
+# from pytorch.dataset import Albu_Dataset
