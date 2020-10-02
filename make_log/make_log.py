@@ -13,7 +13,7 @@ def setup_logger(LOG_DIR, FILE_NAME=None, stderr=True, stderr_level=logging.INFO
         os.makedirs(LOG_DIR)
 
     NOW = datetime.datetime.now(timezone('Asia/Tokyo')).strftime('%Y-%m-%d_%H:%M:%S')
-    out_file = LOG_DIR + "{0}_{1}.log".format(NOW,FILE_NAME)
+    out_file = LOG_DIR + "{0}_{1}.log".format(FILE_NAME,NOW)
 
     #タイムゾーンを東京にコンバート
     def customTime(*args):

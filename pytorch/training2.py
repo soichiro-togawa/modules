@@ -9,14 +9,9 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
-import time, datetime, warnings, os, argparse
-from apex import amp
-
-import sys
-sys.path.append("./")
-# from dir1.mod1 import *
+import time, datetime, warnings,os
+from tqdm import tqdm
 from make_log import setup_logger
-
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform
@@ -48,7 +43,10 @@ predict_path = config.predict_path
 oof_path = config.oof_path
 LOG_DIR = config.LOG_DIR
 LOG_NAME = config.LOG_NAME
-USE_AMP = config.USE_AMP
+#追加のコンフィグ
+output_dimout_features=
+criterion=
+init_lr
 
 def print_config():
     print("DEBUG",DEBUG)
@@ -95,6 +93,167 @@ def print_config_log(logger):
       logger.info("predict_path:{}".format(os.path.exists(config.temp_predict_path)))
     logger.info("#####END######")
 
+def train_epoch(model, loader, optimizer):
+    model.train()
+    train_loss = []
+    bar = tqdm(loader)
+    for (data, target) in bar:
+        optimizer.zero_grad()
+        if use_meta:
+            data, meta = data
+            data, meta, target = data.to(device), meta.to(device), target.to(device)
+            logits = model(data, meta)
+        else:
+            data, target = data.to(device), target.to(device)
+            logits = model(data)
+        loss = criterion(logits, target)
+
+        if not use_amp:
+            loss.backward()
+        else:
+            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                scaled_loss.backward()
+
+        optimizer.step()
+        loss_np = loss.detach().cpu().numpy()
+        train_loss.append(loss_np)
+        smooth_loss = sum(train_loss[-100:]) / min(len(train_loss), 100)
+        bar.set_description('loss: %.5f, smth: %.5f' % (loss_np, smooth_loss))
+    return train_loss
+
+def get_trans(img, I):
+    if I >= 4:
+        img = img.transpose(2,3)
+    if I % 4 == 0:
+        return img
+    elif I % 4 == 1:
+        return img.flip(2)
+    elif I % 4 == 2:
+        return img.flip(3)
+    elif I % 4 == 3:
+        return img.flip(2).flip(3)
+
+def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False):
+    model.eval()
+    val_loss = []
+    LOGITS = []
+    PROBS = []
+    TARGETS = []
+    with torch.no_grad():
+        for (data, target) in tqdm(loader):
+            
+            if use_meta:
+                data, meta = data
+                data, meta, target = data.to(device), meta.to(device), target.to(device)
+                logits = torch.zeros((data.shape[0], out_dim)).to(device)
+                probs = torch.zeros((data.shape[0], out_dim)).to(device)
+                for I in range(n_test):
+                    l = model(get_trans(data, I), meta)
+                    logits += l
+                    probs += l.softmax(1)
+            else:
+                data, target = data.to(device), target.to(device)
+                logits = torch.zeros((data.shape[0], out_dim)).to(device)
+                probs = torch.zeros((data.shape[0], out_dim)).to(device)
+                for I in range(n_test):
+                    l = model(get_trans(data, I))
+                    logits += l
+                    probs += l.softmax(1)
+            logits /= n_test
+            probs /= n_test
+
+            LOGITS.append(logits.detach().cpu())
+            PROBS.append(probs.detach().cpu())
+            TARGETS.append(target.detach().cpu())
+
+            loss = criterion(logits, target)
+            val_loss.append(loss.detach().cpu().numpy())
+
+    val_loss = np.mean(val_loss)
+    LOGITS = torch.cat(LOGITS).numpy()
+    PROBS = torch.cat(PROBS).numpy()
+    TARGETS = torch.cat(TARGETS).numpy()
+
+    if get_output:
+        return PROBS
+    else:
+        acc = (PROBS.argmax(1) == TARGETS).mean() * 100.
+        auc = roc_auc_score((TARGETS==mel_idx).astype(float), PROBS[:, mel_idx])
+        auc_20 = roc_auc_score((TARGETS[is_ext==0]==mel_idx).astype(float), PROBS[is_ext==0, mel_idx])
+        return val_loss, acc, auc, auc_20
+
+def run(fold):
+    
+    i_fold = fold
+
+    if DEBUG:
+        df_this = df_train[df_train['fold'] != i_fold].sample(batch_size * 3)
+        df_valid = df_train[df_train['fold'] == i_fold].sample(batch_size * 3)
+    else:
+        df_this = df_train[df_train['fold'] != i_fold]
+        df_valid = df_train[df_train['fold'] == i_fold]
+    
+    #データセット及びローダー
+    dataset_train = Albu_Dataset(df=df_this,
+                                phase="train", 
+                                transforms=Albu_Transform(image_size=image_size),
+                                aug=train_aug)
+    dataset_valid = Albu_Dataset(df_valid,
+                                phase="train", 
+                                transforms=Albu_Transform(image_size=image_size),
+                                aug=train_aug)
+    train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    valid_loader = torch.utils.data.DataLoader(dataset_valid, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    
+    #モデルの読み込み
+    model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
+    model = model.to(device)
+    logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
+
+    auc_max = 0.
+    auc_20_max = 0.
+    model_file = f'{kernel_type}_best_fold{i_fold}.pth'
+    model_file2 = f'{kernel_type}_best_o_fold{i_fold}.pth'
+    #オプティマイザー
+    optimizer = optim.Adam(model.parameters(), lr=init_lr)
+    if use_amp:
+        model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
+        
+    #スケジューラ
+    # scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, cosine_epo)
+    # scheduler_warmup = GradualWarmupSchedulerV2(optimizer, multiplier=10, total_epoch=warmup_epo, after_scheduler=scheduler_cosine)
+    scheduler_warmup = ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=1, verbose=True, factor=0.2)
+
+    print(len(dataset_train), len(dataset_valid))
+
+    for epoch in range(1, n_epochs+1):
+        print(time.ctime(), 'Epoch:', epoch)
+        scheduler_warmup.step(epoch-1)
+
+        train_loss = train_epoch(model, train_loader, optimizer)
+        val_loss, acc, auc, auc_20 = val_epoch(model, valid_loader, is_ext=df_valid['is_ext'].values)
+
+        content = time.ctime() + ' ' + f'Fold {fold}, Epoch {epoch}, lr: {optimizer.param_groups[0]["lr"]:.7f}, train loss: {np.mean(train_loss):.5f}, valid loss: {(val_loss):.5f}, acc: {(acc):.4f}, auc: {(auc):.6f}, auc_20: {(auc_20):.6f}.'
+        print(content)
+        with open(f'log_{kernel_type}.txt', 'a') as appender:
+            appender.write(content + '\n')
+
+        if auc > auc_max:
+            print('auc_max ({:.6f} --> {:.6f}). Saving model ...'.format(auc_max, auc))
+            torch.save(model.state_dict(), model_file)
+            auc_max = auc
+        if auc_20 > auc_20_max:
+            print('auc_20_max ({:.6f} --> {:.6f}). Saving model ...'.format(auc_20_max, auc_20))
+            torch.save(model.state_dict(), model_file2)
+            auc_20_max = auc_20
+
+    scores.append(auc_max)
+    scores_20.append(auc_20_max)
+    torch.save(model.state_dict(), os.path.join(f'{kernel_type}_model_fold{i_fold}.pth'))
+
+
+
+
 
 def main(df_train, df_test):
     #ロガーのセット
@@ -114,9 +273,9 @@ def main(df_train, df_test):
         patience = es_patience  # Current patience counter
 
         #損失関数のセット
-        criterion = nn.BCEWithLogitsLoss()
+        # criterion = nn.BCEWithLogitsLoss()
         # criterion = nn.BCELoss()
-        # criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss()
         logger.info("criterion:{}".format(str(criterion)))
 
         #モデルクラスの読み込み
@@ -126,8 +285,6 @@ def main(df_train, df_test):
 
         #オプティマイザー、スケジューラ―のセット
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        if USE_AMP:
-          model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
         scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=1, verbose=True, factor=0.2)
         
         #データセットインスタンスの生成
@@ -166,23 +323,23 @@ def main(df_train, df_test):
                 output = model(x)
                 #損失(誤差)の計算
                 #タクラス分類の場合
-                # y = y.long()
-                loss = criterion(output, y.unsqueeze(1))
-                # loss = criterion(output, y)
+                y = y.long()
+                # loss = criterion(output, y.unsqueeze(1))
+                loss = criterion(output, y)
 
                 #逆伝播
-                if not USE_AMP:
-                  loss.backward()
-                else:
-                  with amp.scale_loss(loss, optimizer) as scaled_loss:
-                      scaled_loss.backward()
-
+                #apex2
+                # with amp.scale_loss(loss, optimizer) as scaled_loss:
+                #     scaled_loss.backward()
+                loss.backward()
                 optimizer.step()
 
                 #予測➡roundいるのかどうか問題
-                pred = torch.round(torch.sigmoid(output))
+                # pred = torch.round(torch.sigmoid(output))
                 # pred = torch.round(output)
-                # pred = output.softmax(1)
+                print(output)
+                pred = output.softmax(1)
+                print("pred",pred)
 
                 correct += (pred.cpu() == y.cpu().unsqueeze(1)).sum().item()  # tracking number of correctly predicted samples
                 epoch_loss += loss.item()
@@ -197,9 +354,9 @@ def main(df_train, df_test):
                     x_val = torch.tensor(x_val, device=device, dtype=torch.float32)
                     y_val = torch.tensor(y_val, device=device, dtype=torch.float32)
                     output_val = model(x_val)
-                    val_pred = torch.sigmoid(output_val)
+                    # val_pred = torch.sigmoid(output_val)
                     # val_pred = output_val
-                    # val_pred = output_val.softmax(1)
+                    val_pred = output_val.softmax(1)
 
                     val_preds[j*val_loader.batch_size:j*val_loader.batch_size + x_val.shape[0]] = val_pred
                 val_acc = accuracy_score(df_train.iloc[val_idx][target].values, torch.round(val_preds.cpu()))
@@ -240,13 +397,12 @@ def main(df_train, df_test):
                 y_val = torch.tensor(y_val, device=device, dtype=torch.float32)
                 output_val = model(x_val)
 
-                val_pred = torch.sigmoid(output_val)
+                # val_pred = torch.sigmoid(output_val)
                 # val_pred = output_val
-                # val_pred = output_val.softmax(1)
+                val_pred = output_val.softmax(1)
                 
                 val_preds[j*val_loader.batch_size:j*val_loader.batch_size + x_val.shape[0]] = val_pred
             oof[val_idx] = val_preds.cpu().numpy()
-    logger.info("train_finish")
     return oof
 
 def oof_tocsv(oof_temp):
@@ -261,25 +417,8 @@ def run(df_train, df_test):
     oof_tocsv(oof)
     return oof
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('arg1', help='df_train_path')
-    parser.add_argument('arg2', help='df_test_path')
-    #入力されたものだけ回収
-    args, _ = parser.parse_known_args()
-    return args
-
-# プロファイラーの使い方
-# %cd "/content/drive/My Drive/Pipeline" 
-# train_df.to_csv("/content/train_df.csv",index=False)
-# test_df.to_csv("/content/test_df.csv",index=False)
-# !nvprof -o profile.nvp \
-#       python "pytorch/training.py" "/content/train_df.csv" "/content/test_df.csv"
 if __name__ == '__main__':
-    args = parse_args()
-    df_train = pd.read_csv(args.arg1)
-    df_test = pd.read_csv(args.arg2)
-    run(df_train, df_test)
+    run()
 
 #########使用方法##########
 # import importlib
@@ -287,8 +426,3 @@ if __name__ == '__main__':
 # import pytorch.training
 # importlib.reload(pytorch.training)
 # oof = training.run(df_train, df_test,imfolder_train,imfolder_val)
-
-##pip###
-# #apexのインストール
-# !git clone https://github.com/NVIDIA/apex
-# !pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./apex

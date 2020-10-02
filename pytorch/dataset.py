@@ -9,18 +9,17 @@ print("Albu_Datset","Torch_Dataset")
 
 
 class Albu_Dataset(Dataset):
-    def __init__(self, df: pd.DataFrame, imfolder: str, phase:str = "train", 
+    def __init__(self, df: pd.DataFrame, phase:str = "train", 
                  transforms = None, aug = True, target="target"):
         self.df = df
-        self.imfolder = imfolder
         self.transforms = transforms
         self.phase = phase
         self.aug = aug
         self.target = target
         
-    def __getitem__(self, index, img_colmun="image_name", extension=".jpg"):
+    def __getitem__(self, index, img_column="image_name", extension=""):
         #画像のパスから読み出し
-        im_path = self.df.iloc[index][img_colmun] + extension
+        im_path = self.df.iloc[index][img_column] + extension
         img = cv2.imread(im_path)
         #albu用の処理(torchivisionではいらない)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
@@ -42,18 +41,17 @@ class Albu_Dataset(Dataset):
 
 
 class Torch_Dataset(Dataset):
-    def __init__(self, df: pd.DataFrame, imfolder: str, phase:str = "train", 
+    def __init__(self, df: pd.DataFrame, phase:str = "train", 
                  transforms = None, aug = True, target="target"):
         self.df = df
-        self.imfolder = imfolder
         self.transforms = transforms
         self.phase = phase
         self.aug = aug
         self.target = target
         
-    def __getitem__(self, index, img_colmun="image_name", extension=".jpg"):
+    def __getitem__(self, index, img_column="image_name", extension=""):
         #画像のパスから読み出し
-        im_path = self.df.iloc[index][img_colmun] + extension
+        im_path = self.df.iloc[index][img_column] + extension
         img = cv2.imread(im_path)
         #albu用の処理(torchivisionではいらない)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
@@ -71,3 +69,9 @@ class Torch_Dataset(Dataset):
 
 #########使用方法##########
 # from pytorch.dataset import Albu_Dataset
+
+# from sklearn.model_selection import train_test_split
+# #分割対象をインデックスに
+# train_idx, val_idx = train_test_split(train_df.index, test_size=0.2, shuffle=True, random_state=1,stratify=df_train["target"])
+# print(df_train.iloc[train_idx,-1].value_counts())
+# print(df_train.iloc[val_idx,-1].value_counts())

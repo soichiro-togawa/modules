@@ -36,7 +36,7 @@ class Swish_module(nn.Module):
 
 
 class Ef_Net(nn.Module):
-    def __init__(self, n_meta_features=0):
+    def __init__(self, n_meta_features=0,out_features=1):
         super().__init__()
         #一度インスタンス化するために、archは変数に入れる必要性？？
         arch = EfficientNet.from_pretrained('efficientnet-'+b_num)
@@ -62,7 +62,7 @@ class Ef_Net(nn.Module):
         #     num_ftrs += 128
         #転送する
         # self.myfc  = nn.Linear(in_features=num_ftrs, out_features=1)
-        self.arch._fc  = nn.Linear(in_features=num_ftrs, out_features=1)
+        self.arch._fc  = nn.Linear(in_features=num_ftrs, out_features=out_features)
         # self.arch._fc = nn.Identity()
 
     # self.archで一階層深いところにネットワークを定義しているので、forwardが必須???
