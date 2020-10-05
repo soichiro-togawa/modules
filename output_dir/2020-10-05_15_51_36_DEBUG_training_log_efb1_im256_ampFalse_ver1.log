@@ -1,0 +1,25 @@
+2020-10-05 15:51:36,903 - INFO - logger set up
+2020-10-05 15:51:36,904 - INFO - #####Print_Config######
+2020-10-05 15:51:36,906 - INFO - DEBUG:True
+2020-10-05 15:51:36,907 - INFO - image_size:256
+2020-10-05 15:51:36,908 - INFO - epochs:1
+2020-10-05 15:51:36,909 - INFO - es_patience:3
+2020-10-05 15:51:36,910 - INFO - batch_size:16
+2020-10-05 15:51:36,911 - INFO - num_workers:8
+2020-10-05 15:51:36,912 - INFO - kfold:2
+2020-10-05 15:51:36,913 - INFO - b_num:b1
+2020-10-05 15:51:36,915 - INFO - train_aug,val_aug:TrueFalse
+2020-10-05 15:51:36,916 - INFO - --------path----------
+2020-10-05 15:51:36,917 - INFO - model_name:efb1_im256_ampFalse_ver1
+2020-10-05 15:51:36,919 - INFO - model_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/DEBUG_:False
+2020-10-05 15:51:36,920 - INFO - predict_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/DEBUG_:False
+2020-10-05 15:51:36,921 - INFO - oof_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/DEBUG_:False
+2020-10-05 15:51:36,923 - INFO - #########DEBUG-MODE#############
+2020-10-05 15:51:36,924 - INFO - model_path:True
+2020-10-05 15:51:36,926 - INFO - oof_path:True
+2020-10-05 15:51:36,927 - INFO - predict_path:True
+2020-10-05 15:51:36,929 - INFO - #####END######
+2020-10-05 15:51:36,931 - INFO - device_CPU_GPU:cuda
+2020-10-05 15:51:36,940 - INFO - ====================Fold0====================
+2020-10-05 15:51:36,941 - INFO - criterion:BCEWithLogitsLoss()
+2020-10-05 15:51:37,116 - INFO - device_GPU_True:True

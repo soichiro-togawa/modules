@@ -32,6 +32,8 @@ class Albu_Dataset(Dataset):
         #ラベルを取り出すか否か(テストかトレインか)
         if self.phase == "train":
             y = torch.tensor(self.df.iloc[index][self.target])
+            y = y.float()
+            # y = y.long()
             return img_transformed,y
         else:
             return img_transformed
