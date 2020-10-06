@@ -2,10 +2,7 @@
 import torch.nn as nn
 import torch.tensor
 from efficientnet_pytorch import EfficientNet
-#自作モジュール
-import pytorch.config
-print("クラス一覧")
-print("Ef_Net")
+
 
 #コンフィグの読み直し！！
 from pytorch import config

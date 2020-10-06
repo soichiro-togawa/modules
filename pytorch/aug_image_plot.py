@@ -2,8 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pylab import rcParams
-print("関数一覧")
-print("aug_plot")
+
 
 def aug_plot(dataset_show,row=2,col=5):
     rcParams['figure.figsize'] = 20,10

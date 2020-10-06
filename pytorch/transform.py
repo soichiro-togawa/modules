@@ -5,10 +5,6 @@ import torchtoolbox.transform as transforms
 import albumentations as A
 
 
-print("クラス一覧")
-print("Albu_Transform","Torch_Transform")
-
-
 class Albu_Transform():
     def __init__(self, image_size):
         self.data_transform = {

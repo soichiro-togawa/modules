@@ -81,7 +81,7 @@ def get_trans(img, I):
     elif I % 4 == 3:
         return img.flip(2).flip(3)
         
-def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,device="cuda",mel_idx=0):
+def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,device="cuda",mel_idx=1):
     model.eval()
     val_loss = []
     LOGITS = []
@@ -97,7 +97,8 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,device="cud
                 for I in range(n_test):
                     l = model(get_trans(data, I), meta)
                     logits += l
-                    probs += l.softmax(1)
+                    # probs += l.softmax(1)
+                    probs += l.sigmoid()
             else:
                 data, target = data.to(device), target.to(device)
                 logits = torch.zeros((data.shape[0], out_features)).to(device)
@@ -105,7 +106,8 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,device="cud
                 for I in range(n_test):
                     l = model(get_trans(data, I))
                     logits += l
-                    probs += l.softmax(1)
+                    # probs += l.softmax(1)
+                    probs += l.sigmoid()
             logits /= n_test
             probs /= n_test
 
@@ -122,21 +124,32 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,device="cud
     PROBS = torch.cat(PROBS).numpy()
     TARGETS = torch.cat(TARGETS).numpy()
 
+    print(PROBS.shape)
+    print(TARGETS.shape)
+    TARGETS=TARGETS.reshape(TARGETS.shape[0],1)
+    print("sikiri")
+    # print(PROBS[:, mel_idx])
+
     if get_output:
         return PROBS
     else:
         acc = (PROBS.argmax(1) == TARGETS).mean() * 100.
-        auc = roc_auc_score((TARGETS==mel_idx).astype(float), PROBS[:, mel_idx])
-        auc_20 = roc_auc_score((TARGETS[is_ext==0]==mel_idx).astype(float), PROBS[is_ext==0, mel_idx])
+        # auc = roc_auc_score((TARGETS==mel_idx).astype(float), PROBS[:, mel_idx])
+        auc = roc_auc_score(TARGETS.astype(float), PROBS)
+        # auc_20 = roc_auc_score((TARGETS[is_ext==0]==mel_idx).astype(float), PROBS[is_ext==0, mel_idx])
+        auc_20 = roc_auc_score((TARGETS[is_ext==0]).astype(float), PROBS[is_ext==0])
         return val_loss, acc, auc, auc_20
 
 def fold(df_train,df_test):
+
   logger = setup_logger(LOG_DIR, LOG_NAME)
   config.log_config(logger)
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   logger.info("device_CPU_GPU:{}".format(device))
   oof = np.zeros((len(df_train), 1))  # Out Of Fold predictions
-  preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
+  preds = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device)
+  scores = []
+  scores_20 = []
   skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
 
   for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train[target])):
@@ -145,8 +158,8 @@ def fold(df_train,df_test):
     model_path_fold_2 = model_path + model_name + "_fold{}_2.pth".format(fold)  # Path and filename to save model to
     best_val = 0  # Best validation score within this fold
     patience = es_patience  # Current patience counter
-    auc_max = 0.
-    auc_20_max = 0.
+    val_auc_max = 0.
+    val_auc_20_max = 0.
 
 
     #損失関数のセット
@@ -180,7 +193,7 @@ def fold(df_train,df_test):
     for epoch in range(epochs):
       logger.info("{0} Epoch:{1}".format(time.ctime(),  epoch))
       train_loss = train_epoch(model, train_loader, optimizer,logger)
-      val_loss, acc, val_auc, val_auc_20 = val_epoch(model, val_loader)
+      val_loss, acc, val_auc, val_auc_20 = val_epoch(model, val_loader, is_ext=df_train.iloc[val_idx]['is_ext'].values)
       content = time.ctime() + ' ' + f'Fold {fold}, Epoch {epoch}, lr: {optimizer.param_groups[0]["lr"]:.7f}, train loss: {np.mean(train_loss):.5f}, valid loss: {(val_loss):.5f}, acc: {(acc):.4f}, val_auc: {(val_auc):.6f}, val_auc_20: {(val_auc_20):.6f}.'
       logger.info(content)
       

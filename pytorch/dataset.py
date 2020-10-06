@@ -4,8 +4,6 @@ import pandas as pd
 import torch.tensor
 from torch.utils.data import Dataset
 import cv2
-print("クラス一覧")
-print("Albu_Datset","Torch_Dataset")
 
 
 class Albu_Dataset(Dataset):
@@ -17,7 +15,7 @@ class Albu_Dataset(Dataset):
         self.aug = aug
         self.target = target
         
-    def __getitem__(self, index, img_column="image_name", extension=""):
+    def __getitem__(self, index, img_column="image_path", extension=""):
         #画像のパスから読み出し
         im_path = self.df.iloc[index][img_column] + extension
         img = cv2.imread(im_path)
@@ -51,7 +49,7 @@ class Torch_Dataset(Dataset):
         self.aug = aug
         self.target = target
         
-    def __getitem__(self, index, img_column="image_name", extension=""):
+    def __getitem__(self, index, img_column="image_path", extension=""):
         #画像のパスから読み出し
         im_path = self.df.iloc[index][img_column] + extension
         img = cv2.imread(im_path)

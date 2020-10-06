@@ -4,17 +4,18 @@ USE_AMP = False
 image_size = 256
 epochs = 12  # Number of epochs to run
 es_patience = 3  # Early Stopping patience - for how many epochs with no improvements to wait
-batch_size = 16
+batch_size = 64
 num_workers = 8
 kfold = 5
 b_num = "b1"
-import torch.nn as nn
+import torch.nn as nn,torch
 criterion = nn.BCEWithLogitsLoss()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 out_features=1
 use_meta = False
-train_aug,val_aug,test_aug = False,False,True
+train_aug,val_aug,test_aug = True,False,False
 target = "target"
-TTA = 12 # Test Time Augmentation rounds
+n_val,TTA = 8,12 # Test Time Augmentation rounds
 VERSION = 1
 #path系
 model_name ="ef{0}_im{1}_amp{2}_ver{3}".format(b_num, image_size, USE_AMP, VERSION)
@@ -28,7 +29,7 @@ LOG_NAME = "training_log_" + model_name
 if DEBUG == True:
   epochs = 1
   kfold = 2
-  TTA = 2
+  n_val,TTA =1, 2
   #path系
   temp_model_path = model_path
   temp_oof_path = oof_path
