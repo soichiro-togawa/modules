@@ -16,21 +16,16 @@ from tqdm import tqdm
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform
 from pytorch.model import Ef_Net
-# from pytorch.epoch import train_epoch,get_trans,val_epoch
-#実行ディレクトリはpipline→pipline内のモジュールを使うためにpathを通す
-sys.path.append("./")
+from pytorch.seed import seed_everything
+from pytorch import config
 from make_log import setup_logger
 
 #コンフィグの読み直し！！
 import pytorch
-from pytorch import config
-importlib.reload(pytorch.config)
+importlib.reload(pytorch)
+# importlib.reload(pytorch.model)
+# importlib.reload(pytorch.dataset)
 
-import pytorch.model
-import pytorch.dataset
-importlib.reload(pytorch.model)
-importlib.reload(pytorch.dataset)
-# importlib.reload(pytorch.epoch)
 #config_import_list
 DEBUG, image_size, epochs, es_patience, batch_size, num_workers, kfold, target, b_num, train_aug, val_aug\
 = config.DEBUG, config.image_size, config.epochs, config.es_patience, config.batch_size, config.num_workers, config.kfold, config.target, config.b_num, config.train_aug, config.val_aug
@@ -251,10 +246,24 @@ def get_fold(df_train):
   logger.info("train_finish")
   return oof
 
+def oof_tocsv(oof):
+  oof.to_csv('/content/oof.csv', index=False)
 
+def run(df_train):
+    warnings.simplefilter('ignore')
+    seed_everything(1)
+    oof = get_fold(df_train)
+    oof_tocsv(oof)
+    return oof
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('arg1', help='df_train_path')
+    #入力されたものだけ回収
+    args, _ = parser.parse_known_args()
+    return args
+    
 if __name__ == '__main__':
     args = parse_args()
     df_train = pd.read_csv(args.arg1)
-    df_test = pd.read_csv(args.arg2)
-    fold(df_train, df_test)
+    run(df_train)

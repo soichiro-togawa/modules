@@ -1,30 +1,31 @@
 import numpy as np, pandas as pd
-import sys
-sys.path.append("/content/drive/My Drive/Pipeline/utlis")
-from vprint import vprint
+import sys,importlib
+import argparse, warnings
 
+#自作モジュールの読み込み
+from utils.vprint import vprint
+from pytorch.seed import seed_everything
+from pytorch import config
+importlib.reload(config)
+
+image_dir1 = config.image_dir1
+image_dir2 = config.image_dir2
+image_name = "image_name"
+extension = ".jpg"
 def read_csv():
-    dir_path = "/content/256/"
-    #256
-    imfolder_test = "/content/256/test/"
-    imfolder_train = "/content/256/train/"
-    imfolder_valid = "/content/256/train/"
-    #256_2019
-    imfolder_train2019 = "/content/256_2019/train/"
-    df_train2019 = "/content/256_2019/train.csv"
-    #512
-    # imfolder_test = "/content/test/"
-    # imfolder_train = "/content/train/"
-    # imfolder_valid = "/content/train/"
+    #image_folder
+    imfolder_train = image_dir1 +"train/"
+    imfolder_test = image_dir1 +"test/"
+    imfolder_train2019 = image_dir2 + "train/"
+    #read_csv
+    df_train = pd.read_csv(image_dir1 + "train.csv")
+    df_test = pd.read_csv(image_dir1 + "test.csv")
+    df_train2019 = pd.read_csv(image_dir2 + "train.csv")
 
-    df_train = pd.read_csv(dir_path + "train.csv")
-    df_test = pd.read_csv(dir_path + "test.csv")
-    df_train2019 = pd.read_csv(df_train2019)
-
-    #ファイルパスの記入
-    df_train["image_path"] = imfolder_train + df_train["image_name"] + ".jpg"
-    df_test["image_path"] = imfolder_test + df_test["image_name"] + ".jpg"
-    df_train2019["image_path"] = imfolder_train2019 + df_train2019["image_name"] + ".jpg"
+    #ファイルパスカラムの作成
+    df_train["image_path"] = imfolder_train + df_train[image_name] + extension
+    df_test["image_path"] = imfolder_test + df_test[image_name] + extension
+    df_train2019["image_path"] = imfolder_train2019 + df_train2019[image_name] + extension
     return df_train,df_test,df_train2019
 
 def get_preprocess(df_train,df_test,df_train2,binary=True):
@@ -124,3 +125,29 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
         df_train['target'] = df_train['target'].map(bi_target)
         print(df_train["target"].value_counts())
     return df_train,df_test
+
+def df_tocsv(df_train,df_test):
+  df_train.to_csv('/content/df_train.csv', index=False)
+  df_test.to_csv('/content/df_test.csv', index=False)
+
+def run(binary=True):
+  warnings.simplefilter('ignore')
+  seed_everything(1)
+  a,b,c = read_csv()
+  df_train,df_test = get_preprocess(a,b,c,binary=binary)
+  df_tocsv(df_train,df_test)
+  return df_train,df_test
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--arg1', help='df_train_path')
+    #入力されたものだけ回収
+    args, _ = parser.parse_known_args()
+    return args
+    
+if __name__ == '__main__':
+    args = parse_args()
+    if args.arg1:
+      run(binary=args.arg1)
+    else:
+      run(binary=True)

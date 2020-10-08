@@ -2,8 +2,6 @@
 import os,random
 import numpy as np
 import torch
-print("関数一覧")
-print("seed_everything")
 
 def seed_everything(seed=1,deterministic=True,benchmark=True):
     #hash値の環境変数を新規作成
@@ -20,7 +18,8 @@ def seed_everything(seed=1,deterministic=True,benchmark=True):
     torch.backends.cudnn.deterministic = deterministic
     #動的なモデル(特定の条件で分岐するようなモデルの場合)はFalseにすべき
     torch.backends.cudnn.benchmark = benchmark
+    print("乱数設定完了")
 
 #########使用方法##########
-# import seed
-# seed.seed_everything(1)
+# from pytorch.seed import seed_everything
+# seed_everything(1)

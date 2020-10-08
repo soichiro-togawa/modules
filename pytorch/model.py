@@ -2,13 +2,11 @@
 import torch.nn as nn
 import torch.tensor
 from efficientnet_pytorch import EfficientNet
-
-
-#コンフィグの読み直し！！
-from pytorch import config
-import pytorch
 import importlib
-importlib.reload(pytorch.config)
+
+from pytorch import config
+#コンフィグの読み直し！！
+importlib.reload(config)
 b_num = config.b_num
 
 

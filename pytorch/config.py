@@ -1,3 +1,7 @@
+#config→starter.sh(空白を入れないこと！！！！！)とpreprocess.py用
+image_dir1="/content/image/"
+image_dir2="/content/image_2019/"
+
 #Config train.pyとpredict.py用
 DEBUG = True
 USE_AMP = False

@@ -3,19 +3,19 @@ import torch
 from torch.utils.data import DataLoader
 import pandas as pd
 import numpy as np
-import warnings,os,importlib
+import warnings,os,importlib, argparse,importlib
 from tqdm import tqdm
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform
 from pytorch.model import Ef_Net
+from pytorch.seed import seed_everything
 
 #コンフィグの読み直し！！
 import pytorch
 from pytorch import config
 from pytorch import dataset
-importlib.reload(pytorch.config)
-importlib.reload(pytorch.dataset)
+importlib.reload(pytorch)
 #predict_config
 DEBUG = config.DEBUG
 image_size = config.image_size
@@ -108,20 +108,26 @@ def get_predict(df_test):
     df_test['target'] = pred
     return df_test
     
-def predict_tocsv(df_sub, predict_temp):
-    df_sub[target] = predict_temp.cpu().numpy().reshape(-1,)
-    df_sub.to_csv(predict_path + "predict_{}.csv".format(model_name), index=False)
+def predict_tocsv(df_test):
+  df_test[['image_name', 'target']].to_csv('/content/submission.csv', index=False)
 
-def run(df_test,df_sub,):
-    from pytorch.seed import seed_everything
-    seed_everything(1)
+def run(df_test):
     warnings.simplefilter('ignore')
-    test_predict = main(df_test, )
-    predict_tocsv(df_sub, test_predict)
-    return test_predict
+    seed_everything(1)
+    df_test = get_predict(df_test)
+    predict_tocsv(df_test)
+    return df_test
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('arg1', help='df_train_path')
+    #入力されたものだけ回収
+    args, _ = parser.parse_known_args()
+    return args
 if __name__ == '__main__':
-    run(df_test,df_sub,imfolder_test)
+    args = parse_args()
+    df_test = pd.read_csv(args.arg1)
+    run(df_test)
 
 #########使用方法##########
 # import importlib

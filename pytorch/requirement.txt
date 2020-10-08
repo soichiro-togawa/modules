@@ -2,7 +2,8 @@ torch==1.6.0+cu101
 albumentations==0.4.6
 efficientnet-pytorch==0.7.0
 torchsummary==1.5.1
-
+torchtoolbox==0.1.5
+torchvision==0.7.0+cu101
 opencv-python==4.1.2.30
 Pillow==7.0.0
 
@@ -10,3 +11,6 @@ numpy==1.18.5
 pandas==1.1.2
 scikit-learn==0.22.2.post1
 tqdm==4.41.1
+
+#スケジューラ―
+-e git+https://github.com/ildoonet/pytorch-gradual-warmup-lr.git#egg=pytorch-gradual-warmup-lr
