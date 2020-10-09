@@ -1,14 +1,16 @@
 #モデル
+# pip install torchsummary
+import torch
 import torch.nn as nn
-import torch.tensor
 from efficientnet_pytorch import EfficientNet
-import importlib
+from torchsummary import summary
 
+#自作モジュール
 from pytorch import config
-#コンフィグの読み直し！！
-importlib.reload(config)
 b_num = config.b_num
-
+out_features = config.out_features
+device = config.device
+criterion = config.criterion
 
 #Swishモジュール
 sigmoid = torch.nn.Sigmoid()
@@ -31,7 +33,7 @@ class Swish_module(nn.Module):
 
 
 class Ef_Net(nn.Module):
-    def __init__(self, n_meta_features=0,out_features=1):
+    def __init__(self, n_meta_features=0,out_features=out_features):
         super().__init__()
         #一度インスタンス化するために、archは変数に入れる必要性？？
         arch = EfficientNet.from_pretrained('efficientnet-'+b_num)
@@ -59,22 +61,24 @@ class Ef_Net(nn.Module):
         # self.myfc  = nn.Linear(in_features=num_ftrs, out_features=1)
         self.arch._fc  = nn.Linear(in_features=num_ftrs, out_features=out_features)
         # self.arch._fc = nn.Identity()
-
-    # self.archで一階層深いところにネットワークを定義しているので、forwardが必須???
-    def forward(self, input):
-      #BCElogitの場合
-      output = self.arch(input)
-      return output
+    
+    #self.archで一階層深いところにネットワークを定義しているので、forwardが必須
+    if str(criterion) == "BCELoss()":
+        #BCELossの場合
+        def forward(self, input):
+          output = self.arch(input)
+          m = nn.Sigmoid()
+          output = m(output)
+          return output
+    else:
+        def forward(self, input):
+          #BCElogitの場合
+          output = self.arch(input)
+          return output
     # def extract(self, x):
-    #     x = self.arch(x)
-    #     return x
+    # x = self.arch(x)
+    # return x
 
-    # def forward(self, input):
-    #   #BCELossの場合
-    #   output = self.arch(input)
-    #   m = nn.Sigmoid()
-    #   output = m(output)
-    #   return output
 
     #インスタンスのクラス属性の表示
     def print_attribute(self,key=True,value=True):
@@ -88,6 +92,5 @@ class Ef_Net(nn.Module):
 
     #モデルサマリーgpuセットしないとエラー吐く??
     def model_summary(self):
-        # pip install torchsummary
-        from torchsummary import summary
+        self = self.to(device)
         summary(self.arch,(3,256,256))

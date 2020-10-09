@@ -1,4 +1,4 @@
-#トレーニング＋predict oof
+#トレーニング＋ oof
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -7,24 +7,17 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from efficientnet_pytorch import EfficientNet
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
 from sklearn.model_selection import StratifiedKFold
-import pandas as pd
-import numpy as np
-import time, datetime, warnings, os,sys, argparse,importlib
+import numpy as np, pandas as pd
+import os, sys, time, datetime, warnings, argparse
 from tqdm import tqdm
 
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
-from pytorch.transform import Albu_Transform
+from pytorch.transform import Albu_Transform, get_trans
 from pytorch.model import Ef_Net
 from pytorch.seed import seed_everything
 from pytorch import config
 from make_log import setup_logger
-
-#コンフィグの読み直し！！
-import pytorch
-importlib.reload(pytorch)
-# importlib.reload(pytorch.model)
-# importlib.reload(pytorch.dataset)
 
 #config_import_list
 DEBUG, image_size, epochs, es_patience, batch_size, num_workers, kfold, target, b_num, train_aug, val_aug\
@@ -35,6 +28,13 @@ n_val, device = config.n_val, config.device
 
 if USE_AMP==True:
   from apex import amp
+
+#関数
+def get_val_fold(df_train):
+  skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
+  for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train[target])):
+    df_train.loc[val_idx,"val_fold"] = fold
+  return df_train
 
 def train_epoch(model, loader, optimizer,logger):
     model.train()
@@ -65,19 +65,36 @@ def train_epoch(model, loader, optimizer,logger):
         bar.set_description('loss: %.5f, smth: %.5f' % (loss_np, smooth_loss))
     return train_loss
 
-def get_trans(img, I):
-    if I >= 4:
-        img = img.transpose(2,3)
-    if I % 4 == 0:
-        return img
-    elif I % 4 == 1:
-        return img.flip(2)
-    elif I % 4 == 2:
-        return img.flip(3)
-    elif I % 4 == 3:
-        return img.flip(2).flip(3)
-        
 def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
+  #lossによる分岐
+  if str(criterion) == "BCELoss()":
+    def func1(probs,l):
+      probs += l
+      return probs
+    def func2(logits,target):
+      loss = criterion(logits, target.unsqueeze(1))
+      return loss
+    def func3():
+      pass
+  elif str(criterion) == "BCEWithLogitsLoss()":
+    def func1(probs,l):
+      probs += l.sigmoid()
+      return probs
+    def func2(logits,target):
+      loss = criterion(logits, target.unsqueeze(1))
+      return loss
+    def func3():
+      pass
+  elif str(criterion) == "nn.CrossEntropyLoss()":
+    def func1(probs,l):
+      probs += l.softmax(1)
+      return probs
+    def func2(logits,target):
+      loss = criterion(logits, target)
+      return loss
+    def func3():
+      pass
+
     model.eval()
     val_loss = []
     LOGITS = []
@@ -94,8 +111,9 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
                 for I in range(n_test):
                     l = model(get_trans(data, I), meta)
                     logits += l
+                    probs = func1(probs,l)
                     # probs += l.softmax(1)
-                    probs += l.sigmoid()
+                    # probs += l.sigmoid()
             else:
                 data, target = data.to(device), target.to(device)
                 logits = torch.zeros((data.shape[0], out_features)).to(device)
@@ -103,8 +121,9 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
                 for I in range(n_test):
                     l = model(get_trans(data, I))
                     logits += l
+                    probs = func1(probs,l)
                     # probs += l.softmax(1)
-                    probs += l.sigmoid()
+                    # probs += l.sigmoid()
             logits /= n_test
             probs /= n_test
 
@@ -112,8 +131,9 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
             PROBS.append(probs.detach().cpu())
             TARGETS.append(target.detach().cpu())
 
+            loss = func2(lojits, target)
             # loss = criterion(logits, target)
-            loss = criterion(logits, target.unsqueeze(1))
+            # loss = criterion(logits, target.unsqueeze(1))
             val_loss.append(loss.detach().cpu().numpy())
             if get_output:
               bar.set_description("get_oof")
@@ -168,9 +188,6 @@ def get_fold(df_train):
   scores_20 = []
   PROBS = []
   dfs = []
-  skf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=1)
-  for fold, (train_idx, val_idx) in enumerate(skf.split(X=np.zeros(len(df_train)), y=df_train[target])):
-    df_train.loc[val_idx,"val_fold"] = fold
 
   for fold in range(kfold):
     logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
@@ -235,16 +252,11 @@ def get_fold(df_train):
           logger.info('val_auc_20_max ({:.6f} --> {:.6f}). Saving model ...'.format(val_auc_20_max, val_auc_20))
           torch.save(model.state_dict(), model_path_fold_2)
           val_auc_20_max = val_auc_20
-
   
     scores.append(val_auc_max)
     scores_20.append(val_auc_20_max)
     # torch.save(model.state_dict(), os.path.join(f'{kernel_type}_model_fold{i_fold}.pth'))
-    
-  #getoof
-  oof = get_oof(df_train)
   logger.info("train_finish")
-  return oof
 
 def oof_tocsv(oof):
   oof.to_csv('/content/oof.csv', index=False)
@@ -252,18 +264,21 @@ def oof_tocsv(oof):
 def run(df_train):
     warnings.simplefilter('ignore')
     seed_everything(1)
-    oof = get_fold(df_train)
+    df_train = get_val_fold(df_train)
+    get_fold(df_train)
+    oof = get_oof(df_train)
     oof_tocsv(oof)
     return oof
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('arg1', help='df_train_path')
-    #入力されたものだけ回収
-    args, _ = parser.parse_known_args()
-    return args
     
 if __name__ == '__main__':
+    def parse_args():
+      parser = argparse.ArgumentParser()
+      parser.add_argument('arg1', help='df_train_path')
+      #入力されたものだけ回収
+      args, _ = parser.parse_known_args()
+      return args
+
     args = parse_args()
     df_train = pd.read_csv(args.arg1)
     run(df_train)

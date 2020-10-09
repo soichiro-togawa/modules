@@ -12,10 +12,10 @@ batch_size = 64
 num_workers = 8
 kfold = 5
 b_num = "b1"
+out_features = 1
 import torch.nn as nn,torch
 criterion = nn.BCEWithLogitsLoss()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-out_features=1
 use_meta = False
 train_aug,val_aug,test_aug = True,False,False
 target = "target"

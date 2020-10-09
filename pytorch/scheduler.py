@@ -18,7 +18,7 @@ class GradualWarmupSchedulerV2(GradualWarmupScheduler):
             return [base_lr * ((self.multiplier - 1.) * self.last_epoch / self.total_epoch + 1.) for base_lr in self.base_lrs]
 
 ######使用方法#######
-from pytorch.sheduler import GradualWarmupSchedulerV2()
+# from pytorch.sheduler import GradualWarmupSchedulerV2()
 # freeze_epo = 0
 # warmup_epo = 1
 # cosine_epo = 4

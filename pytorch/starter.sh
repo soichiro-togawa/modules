@@ -39,6 +39,7 @@ fi
 
 
 echo "============pip関連============"
+#1>/dev/nullするとバグることあり（gitからもってくる時）
 pip install -r "/content/drive/My Drive/Pipeline/pytorch/requirement.txt"
 
 if [ $apex = True ]; then

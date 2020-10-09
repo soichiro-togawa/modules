@@ -4,6 +4,17 @@
 import torchtoolbox.transform as transforms
 import albumentations as A
 
+def get_trans(img, I):
+    if I >= 4:
+        img = img.transpose(2,3)
+    if I % 4 == 0:
+        return img
+    elif I % 4 == 1:
+        return img.flip(2)
+    elif I % 4 == 2:
+        return img.flip(3)
+    elif I % 4 == 3:
+        return img.flip(2).flip(3)
 
 class Albu_Transform():
     def __init__(self, image_size):

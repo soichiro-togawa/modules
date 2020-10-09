@@ -1,16 +1,16 @@
-import sys,os
-print("f",__file__)
-print("p",__package__)
-print("n",__name__)
-# print(sys.modules)
-# print(len(sys.modules))
-print(os.getcwd())
-# print(sys.path)
-# sys.path.append("/content/drive/My Drive/Pipeline")
-for i,j in enumerate(sys.path):
-  print(i,j)
-print("len:",len(sys.path))
-op = "opop"
+# import sys,os,importlib
+# print("f",__file__)
+# print("p",__package__)
+# print("n",__name__)
+# # print(sys.modules)
+# # print(len(sys.modules))
+# print(os.getcwd())
+# # print(sys.path)
+# # sys.path.append("/content/drive/My Drive/Pipeline")
+# for i,j in enumerate(sys.path):
+#   print(i,j)
+# print("len:",len(sys.path))
+# op = "opop"
 # #sys.pathでのパスはpwd地点からのパス→import時のパスは、インポートに使用された環境変数からのパス
 # sys.path.append(os.getcwd())
 # print(sys.path)
@@ -32,3 +32,4 @@ op = "opop"
 # import train
 # import numpy as np
 # np.app()
+# print(config.DEBUG)

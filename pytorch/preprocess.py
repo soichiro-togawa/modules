@@ -1,12 +1,10 @@
 import numpy as np, pandas as pd
-import sys,importlib
-import argparse, warnings
+import sys,argparse, warnings
 
 #自作モジュールの読み込み
 from utils.vprint import vprint
 from pytorch.seed import seed_everything
 from pytorch import config
-importlib.reload(config)
 
 image_dir1 = config.image_dir1
 image_dir2 = config.image_dir2

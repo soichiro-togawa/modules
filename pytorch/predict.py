@@ -1,21 +1,18 @@
 #トレーニング＋predict oof
 import torch
 from torch.utils.data import DataLoader
-import pandas as pd
-import numpy as np
-import warnings,os,importlib, argparse,importlib
+import numpy as np, pandas as pd
+import os, sys, warnings, argparse
 from tqdm import tqdm
+
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
-from pytorch.transform import Albu_Transform
+from pytorch.transform import Albu_Transform, get_trans
 from pytorch.model import Ef_Net
 from pytorch.seed import seed_everything
-
-#コンフィグの読み直し！！
-import pytorch
 from pytorch import config
-from pytorch import dataset
-importlib.reload(pytorch)
+
+
 #predict_config
 DEBUG = config.DEBUG
 image_size = config.image_size
@@ -33,17 +30,6 @@ device = config.device
 LOG_DIR, LOG_NAME = config.LOG_DIR, config.LOG_NAME
 use_meta,out_features = config.use_meta,config.out_features
 
-def get_trans(img, I):
-    if I >= 4:
-        img = img.transpose(2,3)
-    if I % 4 == 0:
-        return img
-    elif I % 4 == 1:
-        return img.flip(2)
-    elif I % 4 == 2:
-        return img.flip(3)
-    elif I % 4 == 3:
-        return img.flip(2).flip(3)
 
 def get_predict(df_test):
     print("device_CPU_GPU:", device)
