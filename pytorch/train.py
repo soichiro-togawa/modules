@@ -131,7 +131,7 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
             PROBS.append(probs.detach().cpu())
             TARGETS.append(target.detach().cpu())
 
-            loss = func2(lojits, target)
+            loss = func2(logits, target)
             # loss = criterion(logits, target)
             # loss = criterion(logits, target.unsqueeze(1))
             val_loss.append(loss.detach().cpu().numpy())
