@@ -1,16 +1,16 @@
-#モデル
+#インポート
 # pip install torchsummary
 import torch
 import torch.nn as nn
 from efficientnet_pytorch import EfficientNet
 from torchsummary import summary
-
 #自作モジュール
 from pytorch import config
-b_num = config.b_num
-out_features = config.out_features
-device = config.device
-criterion = config.criterion
+#コンフィグ
+b_num = config.MODEL_CONFIG["b_num"]
+out_features = config.MODEL_CONFIG["out_features"]
+device = config.MODEL_CONFIG["device"]
+criterion = config.MODEL_CONFIG["criterion"]
 
 #Swishモジュール
 sigmoid = torch.nn.Sigmoid()
@@ -90,7 +90,7 @@ class Ef_Net(nn.Module):
         else:
           print(j)
 
-    #モデルサマリーgpuセットしないとエラー吐く??
+    #モデルサマリーgpuセットしないとエラー吐く→この関数実行するとcudaにセットされちゃう
     def model_summary(self):
         self = self.to(device)
         summary(self.arch,(3,256,256))

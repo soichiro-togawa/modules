@@ -1,5 +1,6 @@
 # import pytorchしたタイミングでパッケージ内全モジュールがリロードされる
 # importlib.reload(pytorch)と組み合わせることで簡単にリロードできる
+#全モジュールが読み込まれるから、おかしいコードが検出できる
 import os,importlib
 abs_path = os.path.dirname(os.path.abspath(__file__))
 py_files = os.listdir(abs_path)

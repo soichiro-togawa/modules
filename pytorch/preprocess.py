@@ -1,25 +1,33 @@
+#インポート
 import numpy as np, pandas as pd
-import sys,argparse, warnings
-
+import os,sys,argparse, warnings
+from tqdm import tqdm
 #自作モジュールの読み込み
-from utils.vprint import vprint
 from pytorch.seed import seed_everything
 from pytorch import config
 
-image_dir1 = config.image_dir1
-image_dir2 = config.image_dir2
-image_name = "image_name"
-extension = ".jpg"
+#コンフィグ
+data_dir1 = config.data_dir1
+data_dir2 = config.data_dir2
+image_name = config.PREPROCESS_CONFIG["image_name"]
+target = config.PREPROCESS_CONFIG["target"]
+extension = config.PREPROCESS_CONFIG["extension"]
+use_meta = config.PREPROCESS_CONFIG["use_meta"]
+use_external = config.PREPROCESS_CONFIG["use_external"]
+#path
+df_train_preprocessed_path = config.PATH_CONFIG["df_train_preprocessed_path"]
+df_test_preprocessed_path = config.PATH_CONFIG["df_test_preprocessed_path"]
+
+#関数
 def read_csv():
     #image_folder
-    imfolder_train = image_dir1 +"train/"
-    imfolder_test = image_dir1 +"test/"
-    imfolder_train2019 = image_dir2 + "train/"
+    imfolder_train = data_dir1 +"train/"
+    imfolder_test = data_dir1 +"test/"
+    imfolder_train2019 = data_dir2 + "train/"
     #read_csv
-    df_train = pd.read_csv(image_dir1 + "train.csv")
-    df_test = pd.read_csv(image_dir1 + "test.csv")
-    df_train2019 = pd.read_csv(image_dir2 + "train.csv")
-
+    df_train = pd.read_csv(data_dir1 + "train.csv")
+    df_test = pd.read_csv(data_dir1 + "test.csv")
+    df_train2019 = pd.read_csv(data_dir2 + "train.csv")
     #ファイルパスカラムの作成
     df_train["image_path"] = imfolder_train + df_train[image_name] + extension
     df_test["image_path"] = imfolder_test + df_test[image_name] + extension
@@ -27,9 +35,6 @@ def read_csv():
     return df_train,df_test,df_train2019
 
 def get_preprocess(df_train,df_test,df_train2,binary=True):
-    use_meta = True
-    use_external = True
-
     #工程１
     df_train = df_train[df_train['tfrecord'] != -1].reset_index(drop=True)
     df_train['fold'] = df_train['tfrecord'] % 5
@@ -42,7 +47,6 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
         6:4, 7:4, 14:4,}
     df_train['fold'] = df_train['tfrecord'].map(tfrecord2fold)
     df_train['is_ext'] = 0
-
     df_train['diagnosis'] = df_train['diagnosis'].apply(lambda x: x.replace('seborrheic keratosis', 'BKL'))
     df_train['diagnosis'] = df_train['diagnosis'].apply(lambda x: x.replace('lichenoid keratosis', 'BKL'))
     df_train['diagnosis'] = df_train['diagnosis'].apply(lambda x: x.replace('solar lentigo', 'BKL'))
@@ -66,13 +70,11 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
     #dianosis2のラベルエンコーディング(対応表)
     diagnosis2idx = {d: idx for idx, d in enumerate(sorted(df_train.diagnosis.unique()))}
     print(diagnosis2idx)
-    df_train['target'] = df_train['diagnosis'].map(diagnosis2idx)
+    df_train[target] = df_train['diagnosis'].map(diagnosis2idx)
     mel_idx = diagnosis2idx['melanoma']
-    vprint(mel_idx)
+    print("mel_idx=",mel_idx)
 
     #工程３
-    from tqdm import tqdm
-    import os
     if use_meta:
         # One-hot encoding of anatom_site_general_challenge feature
         concat = pd.concat([df_train['anatom_site_general_challenge'], df_test['anatom_site_general_challenge']], ignore_index=True)
@@ -109,10 +111,10 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
         df_test['image_size'] = np.log(test_sizes)
         meta_features = ['sex', 'age_approx', 'n_images', 'image_size'] + [col for col in df_train.columns if col.startswith('site_')]
         n_meta_features = len(meta_features)
+        print("\n",n_meta_features,meta_features)
     else:
         n_meta_features = 0
-    print("\n",n_meta_features,meta_features)
-    df_train.head(2)
+
 
     #二値モデル用
     if binary:
@@ -120,14 +122,15 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
             0:0, 1:0, 2:0,
             3:0, 4:0, 5:0,
             6:1, 7:0, 8:0}
-        df_train['target'] = df_train['target'].map(bi_target)
+        df_train[target] = df_train[target].map(bi_target)
         print(df_train["target"].value_counts())
     return df_train,df_test
 
 def df_tocsv(df_train,df_test):
-  df_train.to_csv('/content/df_train.csv', index=False)
-  df_test.to_csv('/content/df_test.csv', index=False)
+  df_train.to_csv(df_train_preprocessed_path, index=False)
+  df_test.to_csv(df_test_preprocessed_path, index=False)
 
+#実行関数
 def run(binary=True):
   warnings.simplefilter('ignore')
   seed_everything(1)
@@ -136,6 +139,7 @@ def run(binary=True):
   df_tocsv(df_train,df_test)
   return df_train,df_test
 
+#コマンドライン引数、if_main
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--arg1', help='df_train_path')

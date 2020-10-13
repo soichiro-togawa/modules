@@ -1,10 +1,9 @@
-#トレーニング＋predict oof
+#インポート
 import torch
 from torch.utils.data import DataLoader
 import numpy as np, pandas as pd
 import os, sys, warnings, argparse
 from tqdm import tqdm
-
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform, get_trans
@@ -12,24 +11,15 @@ from pytorch.model import Ef_Net
 from pytorch.seed import seed_everything
 from pytorch import config
 
-
-#predict_config
-DEBUG = config.DEBUG
-image_size = config.image_size
-batch_size = config.batch_size
-num_workers = config.num_workers
-kfold = config.kfold
-test_aug = config.test_aug
-target = config.target
-TTA = config.TTA
-model_name = config.model_name
-model_path = config.model_path
-predict_path = config.predict_path
-oof_path = config.oof_path
-device = config.device
-LOG_DIR, LOG_NAME = config.LOG_DIR, config.LOG_NAME
-use_meta,out_features = config.use_meta,config.out_features
-
+#コンフィグ
+DEBUG, image_size, batch_size, num_workers, kfold, test_aug,TTA\
+= config.TRAIN_CONFIG["DEBUG"], config.TRAIN_CONFIG["image_size"], config.TRAIN_CONFIG["batch_size"], config.TRAIN_CONFIG["num_workers"], config.TRAIN_CONFIG["kfold"], config.TRAIN_CONFIG["test_aug"], config.TRAIN_CONFIG["TTA"]
+#既出
+use_meta, target, out_features, device, criterion\
+= config.TRAIN_CONFIG["use_meta"], config.TRAIN_CONFIG["target"], config.TRAIN_CONFIG["out_features"], config.TRAIN_CONFIG["device"], config.TRAIN_CONFIG["criterion"]
+#path
+model_path, predict_path, LOG_DIR, LOG_NAME\
+= config.PATH_CONFIG["model_path"], config.PATH_CONFIG["predict_path"], config.PATH_CONFIG["LOG_DIR"], config.PATH_CONFIG["LOG_NAME"]
 
 def get_predict(df_test):
     print("device_CPU_GPU:", device)
@@ -41,7 +31,7 @@ def get_predict(df_test):
 
     for fold in range(kfold):
         print('=' * 20, 'Fold', fold, '=' * 20)
-        model_path_fold = model_path + model_name + "_fold{}.pth".format(fold)
+        model_path_fold = model_path + "_fold{}.pth".format(fold)
         print(model_path_fold)
         model = Ef_Net()
         model = model.to(device)
@@ -95,7 +85,7 @@ def get_predict(df_test):
     return df_test
     
 def predict_tocsv(df_test):
-  df_test[['image_name', 'target']].to_csv('/content/submission.csv', index=False)
+  df_test[['image_name', 'target']].to_csv(predict_path, index=False)
 
 def run(df_test):
     warnings.simplefilter('ignore')

@@ -1,4 +1,4 @@
-#トレーニング＋ oof
+#インポート
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -10,7 +10,6 @@ from sklearn.model_selection import StratifiedKFold
 import numpy as np, pandas as pd
 import os, sys, time, datetime, warnings, argparse
 from tqdm import tqdm
-
 #自作モジュール
 from pytorch.dataset import Albu_Dataset
 from pytorch.transform import Albu_Transform, get_trans
@@ -19,13 +18,16 @@ from pytorch.seed import seed_everything
 from pytorch import config
 from make_log import setup_logger
 
-#config_import_list
-DEBUG, image_size, epochs, es_patience, batch_size, num_workers, kfold, target, b_num, train_aug, val_aug\
-= config.DEBUG, config.image_size, config.epochs, config.es_patience, config.batch_size, config.num_workers, config.kfold, config.target, config.b_num, config.train_aug, config.val_aug
-model_name, model_path, predict_path, oof_path,LOG_DIR, LOG_NAME,USE_AMP, criterion, out_features, use_meta\
-= config.model_name, config.model_path, config.predict_path, config.oof_path, config.LOG_DIR, config.LOG_NAME, config.USE_AMP, config.criterion,config. out_features, config.use_meta
-n_val, device = config.n_val, config.device
-
+#コンフィグ
+DEBUG, USE_AMP, image_size, epochs, es_patience, batch_size, num_workers, kfold, train_aug, val_aug, n_val\
+= config.TRAIN_CONFIG["DEBUG"], config.TRAIN_CONFIG["USE_AMP"], config.TRAIN_CONFIG["image_size"], config.TRAIN_CONFIG["epochs"], config.TRAIN_CONFIG["es_patience"], config.TRAIN_CONFIG["batch_size"], config.TRAIN_CONFIG["num_workers"], config.TRAIN_CONFIG["kfold"], config.TRAIN_CONFIG["train_aug"], config.TRAIN_CONFIG["val_aug"], config.TRAIN_CONFIG["n_val"]
+#既出
+use_meta, target, out_features, device, criterion\
+= config.TRAIN_CONFIG["use_meta"], config.TRAIN_CONFIG["target"], config.TRAIN_CONFIG["out_features"], config.TRAIN_CONFIG["device"], config.TRAIN_CONFIG["criterion"]
+#path
+model_path, oof_path, LOG_DIR, LOG_NAME\
+= config.PATH_CONFIG["model_path"], config.PATH_CONFIG["oof_path"], config.PATH_CONFIG["LOG_DIR"], config.PATH_CONFIG["LOG_NAME"]
+#apexのインポート
 if USE_AMP==True:
   from apex import amp
 
@@ -66,34 +68,34 @@ def train_epoch(model, loader, optimizer,logger):
     return train_loss
 
 def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
-  #lossによる分岐
-  if str(criterion) == "BCELoss()":
-    def func1(probs,l):
-      probs += l
-      return probs
-    def func2(logits,target):
-      loss = criterion(logits, target.unsqueeze(1))
-      return loss
-    def func3():
-      pass
-  elif str(criterion) == "BCEWithLogitsLoss()":
-    def func1(probs,l):
-      probs += l.sigmoid()
-      return probs
-    def func2(logits,target):
-      loss = criterion(logits, target.unsqueeze(1))
-      return loss
-    def func3():
-      pass
-  elif str(criterion) == "nn.CrossEntropyLoss()":
-    def func1(probs,l):
-      probs += l.softmax(1)
-      return probs
-    def func2(logits,target):
-      loss = criterion(logits, target)
-      return loss
-    def func3():
-      pass
+    #lossによる分岐
+    if str(criterion) == "BCELoss()":
+      def func1(probs,l):
+        probs += l
+        return probs
+      def func2(logits,target):
+        loss = criterion(logits, target.unsqueeze(1))
+        return loss
+      def func3():
+        pass
+    elif str(criterion) == "BCEWithLogitsLoss()":
+      def func1(probs,l):
+        probs += l.sigmoid()
+        return probs
+      def func2(logits,target):
+        loss = criterion(logits, target.unsqueeze(1))
+        return loss
+      def func3():
+        pass
+    elif str(criterion) == "CrossEntropyLoss()":
+      def func1(probs,l):
+        probs += l.softmax(1)
+        return probs
+      def func2(logits,target):
+        loss = criterion(logits, target)
+        return loss
+      def func3():
+        pass
 
     model.eval()
     val_loss = []
@@ -165,7 +167,7 @@ def get_oof(df_train):
                                 transforms=Albu_Transform(image_size=image_size),
                                 aug=val_aug)
     val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-    model_path_fold_1 = model_path + model_name + "_fold{}_1.pth".format(fold)
+    model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)
     model = Ef_Net()
     model = model.to(device)
     model.load_state_dict(torch.load(model_path_fold_1))
@@ -191,8 +193,8 @@ def get_fold(df_train):
 
   for fold in range(kfold):
     logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
-    model_path_fold_1 = model_path + model_name + "_fold{}_1.pth".format(fold)  # Path and filename to save model to
-    model_path_fold_2 = model_path + model_name + "_fold{}_2.pth".format(fold)  # Path and filename to save model to
+    model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)  # Path and filename to save model to
+    model_path_fold_2 = model_path + "_fold{}_2.pth".format(fold)  # Path and filename to save model to
     best_val = 0  # Best validation score within this fold
     patience = es_patience  # Current patience counter
     val_auc_max = 0.
@@ -255,11 +257,10 @@ def get_fold(df_train):
   
     scores.append(val_auc_max)
     scores_20.append(val_auc_20_max)
-    # torch.save(model.state_dict(), os.path.join(f'{kernel_type}_model_fold{i_fold}.pth'))
   logger.info("train_finish")
 
 def oof_tocsv(oof):
-  oof.to_csv('/content/oof.csv', index=False)
+  oof.to_csv(oof_path, index=False)
 
 def run(df_train):
     warnings.simplefilter('ignore')

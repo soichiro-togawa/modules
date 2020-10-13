@@ -4,9 +4,9 @@
 image_size=256
 apex=False
 #config.pyから引用
-source "/content/drive/My Drive/Pipeline/pytorch/config.py"
-dir1=${image_dir1}
-dir2=${image_dir2}
+source "/content/drive/My Drive/Pipeline/pytorch/config.py" >&/dev/null
+dir1=${data_dir1}
+dir2=${data_dir2}
 unzip1="/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/data/256.zip"
 unzip2="/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/data/256_2019.zip"
 unzip3="/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/512.zip"
@@ -39,8 +39,8 @@ fi
 
 
 echo "============pip関連============"
-#1>/dev/nullするとバグることあり（gitからもってくる時）
-pip install -r "/content/drive/My Drive/Pipeline/pytorch/requirement.txt"
+#pipインストールした後は、ランタイムを再起動した方がベター
+pip install -r "/content/drive/My Drive/Pipeline/pytorch/requirement.txt" 1>/dev/null
 
 if [ $apex = True ]; then
   echo "============apexを使用します============"

@@ -1,10 +1,8 @@
-#データセット
-import numpy as np
-import pandas as pd
+#インポート
+import numpy as np, pandas as pd
 import torch.tensor
 from torch.utils.data import Dataset
 import cv2
-
 
 class Albu_Dataset(Dataset):
     def __init__(self, df: pd.DataFrame, phase:str = "train", 
