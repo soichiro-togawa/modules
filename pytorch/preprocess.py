@@ -111,7 +111,12 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
         df_test['image_size'] = np.log(test_sizes)
         meta_features = ['sex', 'age_approx', 'n_images', 'image_size'] + [col for col in df_train.columns if col.startswith('site_')]
         n_meta_features = len(meta_features)
-        print("\n",n_meta_features,meta_features)
+        #無理やりdf_trainに情報保存しておく
+        meta_features.append(n_meta_features)
+        meta_features = ','.join(map(str, meta_features))
+        df_train["meta"] = meta_features
+        df_test["meta"] = meta_features
+        # print("\n",n_meta_features,meta_features)
     else:
         n_meta_features = 0
 

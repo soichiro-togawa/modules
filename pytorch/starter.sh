@@ -20,7 +20,7 @@ fi
 
 
 echo "============開始============"
-cd "/"
+cd "/content"
 mkdir $dir1
 mkdir $dir2
 
@@ -34,18 +34,18 @@ elif [ $image_size = 512 ]; then
   echo "================image_sizeは512================"
   unzip $unzip3 -d $dir1
 else
-  echo "================該当イメージサイズなし================"
+  echo "================該当イメージサイズなし→unzip非実行================"
 fi
 
 
 echo "============pip関連============"
 #pipインストールした後は、ランタイムを再起動した方がベター
-pip install -r "/content/drive/My Drive/Pipeline/pytorch/requirement.txt" 1>/dev/null
+pip install -r "/content/drive/My Drive/Pipeline/pytorch/requirement.txt" 1>&/dev/null
 
 if [ $apex = True ]; then
   echo "============apexを使用します============"
   git clone "https://github.com/NVIDIA/apex"
-  pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./apex 2>&/dev/null
+  pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./apex
 else
   echo "============apexなし============"
 fi

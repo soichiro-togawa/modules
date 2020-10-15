@@ -8,7 +8,7 @@ PREPROCESS_CONFIG ={
 "image_name": "image_name",
 "target": "target",
 "extension": ".jpg",
-"use_meta": False,
+"use_meta": True,
 "use_external": True,
 }
 
@@ -17,8 +17,12 @@ import torch, torch.nn as nn
 MODEL_CONFIG ={
 "b_num": "b1",
 "out_features": 1,
+"out_features": 9,
 "criterion": nn.BCEWithLogitsLoss(),
+"criterion": nn.CrossEntropyLoss(),
 "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+#既出
+"use_meta": PREPROCESS_CONFIG["use_meta"],
 }
 
 #train.pyとpredict.py
@@ -31,8 +35,10 @@ TRAIN_CONFIG ={
 "batch_size": 64,
 "num_workers": 8,
 "kfold": 5,
+"fold_list":[0,1,2,3,4], #実行したいfold番号をリストに(0始まり)
+# "fold_list":[2,3,4],
 "train_aug": True, "val_aug": False, "test_aug": False,
-"n_val": 8, "TTA": 12,  #n_val→get_transの回数
+"n_val": 8, "TTA": 8,  #n_val→get_transの回数
 #既出
 "use_meta": PREPROCESS_CONFIG["use_meta"],"target": PREPROCESS_CONFIG["target"],
 "out_features": MODEL_CONFIG["out_features"],"criterion": MODEL_CONFIG["criterion"],"device": MODEL_CONFIG["device"],
@@ -42,7 +48,7 @@ TRAIN_CONFIG ={
 PATH_CONFIG ={
 "df_train_preprocessed_path": "/content/df_train.csv",
 "df_test_preprocessed_path": "/content/df_test.csv",
-"VERSION": 1,
+"VERSION": 2,
 "model_path": "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/",
 "oof_path": "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/",
 "predict_path": "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/",
@@ -65,8 +71,8 @@ if TRAIN_CONFIG["DEBUG"] == True:
     PATH_CONFIG["model_name"] = "DEBUG_" + PATH_CONFIG["model_name"]
     PATH_CONFIG["LOG_NAME"] = "DEBUG_" + PATH_CONFIG["LOG_NAME"]
 PATH_CONFIG["model_path"] =  PATH_CONFIG["model_path"] + PATH_CONFIG["model_name"] #foldと.pthはtrain.pyで足す
-PATH_CONFIG["oof_path"] =  PATH_CONFIG["oof_path"] + PATH_CONFIG["model_name"] + ".csv"
-PATH_CONFIG["predict_path"] =  PATH_CONFIG["predict_path"] + PATH_CONFIG["model_name"] + ".csv"
+PATH_CONFIG["oof_path"] =  PATH_CONFIG["oof_path"] + "OOF_" + PATH_CONFIG["model_name"] + ".csv"
+PATH_CONFIG["predict_path"] =  PATH_CONFIG["predict_path"] + "PREDICT_" + PATH_CONFIG["model_name"] + ".csv"
 
 
 #コンフィグのログ

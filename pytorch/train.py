@@ -16,11 +16,12 @@ from pytorch.transform import Albu_Transform, get_trans
 from pytorch.model import Ef_Net
 from pytorch.seed import seed_everything
 from pytorch import config
+from pytorch.branch_func import branch
 from make_log import setup_logger
 
 #コンフィグ
-DEBUG, USE_AMP, image_size, epochs, es_patience, batch_size, num_workers, kfold, train_aug, val_aug, n_val\
-= config.TRAIN_CONFIG["DEBUG"], config.TRAIN_CONFIG["USE_AMP"], config.TRAIN_CONFIG["image_size"], config.TRAIN_CONFIG["epochs"], config.TRAIN_CONFIG["es_patience"], config.TRAIN_CONFIG["batch_size"], config.TRAIN_CONFIG["num_workers"], config.TRAIN_CONFIG["kfold"], config.TRAIN_CONFIG["train_aug"], config.TRAIN_CONFIG["val_aug"], config.TRAIN_CONFIG["n_val"]
+DEBUG, USE_AMP, image_size, epochs, es_patience, batch_size, num_workers, kfold, fold_list, train_aug, val_aug, n_val\
+= config.TRAIN_CONFIG["DEBUG"], config.TRAIN_CONFIG["USE_AMP"], config.TRAIN_CONFIG["image_size"], config.TRAIN_CONFIG["epochs"], config.TRAIN_CONFIG["es_patience"], config.TRAIN_CONFIG["batch_size"], config.TRAIN_CONFIG["num_workers"], config.TRAIN_CONFIG["kfold"], config.TRAIN_CONFIG["fold_list"], config.TRAIN_CONFIG["train_aug"], config.TRAIN_CONFIG["val_aug"], config.TRAIN_CONFIG["n_val"]
 #既出
 use_meta, target, out_features, device, criterion\
 = config.TRAIN_CONFIG["use_meta"], config.TRAIN_CONFIG["target"], config.TRAIN_CONFIG["out_features"], config.TRAIN_CONFIG["device"], config.TRAIN_CONFIG["criterion"]
@@ -28,8 +29,11 @@ use_meta, target, out_features, device, criterion\
 model_path, oof_path, LOG_DIR, LOG_NAME\
 = config.PATH_CONFIG["model_path"], config.PATH_CONFIG["oof_path"], config.PATH_CONFIG["LOG_DIR"], config.PATH_CONFIG["LOG_NAME"]
 #apexのインポート
-if USE_AMP==True:
-  from apex import amp
+if USE_AMP:
+    from apex import amp, optimizers
+
+#前段階=lossの種類による分岐
+func1,func2,func3,func4,func5,func6 = branch(criterion)
 
 #関数
 def get_val_fold(df_train):
@@ -51,8 +55,7 @@ def train_epoch(model, loader, optimizer,logger):
         else:
             data, target = data.to(device), target.to(device)
             logits = model(data)
-        # loss = criterion(logits, target)
-        loss = criterion(logits, target.unsqueeze(1))
+        loss = func2(logits, target)
 
         if not USE_AMP:
             loss.backward()
@@ -67,36 +70,7 @@ def train_epoch(model, loader, optimizer,logger):
         bar.set_description('loss: %.5f, smth: %.5f' % (loss_np, smooth_loss))
     return train_loss
 
-def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
-    #lossによる分岐
-    if str(criterion) == "BCELoss()":
-      def func1(probs,l):
-        probs += l
-        return probs
-      def func2(logits,target):
-        loss = criterion(logits, target.unsqueeze(1))
-        return loss
-      def func3():
-        pass
-    elif str(criterion) == "BCEWithLogitsLoss()":
-      def func1(probs,l):
-        probs += l.sigmoid()
-        return probs
-      def func2(logits,target):
-        loss = criterion(logits, target.unsqueeze(1))
-        return loss
-      def func3():
-        pass
-    elif str(criterion) == "CrossEntropyLoss()":
-      def func1(probs,l):
-        probs += l.softmax(1)
-        return probs
-      def func2(logits,target):
-        loss = criterion(logits, target)
-        return loss
-      def func3():
-        pass
-
+def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=6):
     model.eval()
     val_loss = []
     LOGITS = []
@@ -114,8 +88,6 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
                     l = model(get_trans(data, I), meta)
                     logits += l
                     probs = func1(probs,l)
-                    # probs += l.softmax(1)
-                    # probs += l.sigmoid()
             else:
                 data, target = data.to(device), target.to(device)
                 logits = torch.zeros((data.shape[0], out_features)).to(device)
@@ -124,8 +96,6 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
                     l = model(get_trans(data, I))
                     logits += l
                     probs = func1(probs,l)
-                    # probs += l.softmax(1)
-                    # probs += l.sigmoid()
             logits /= n_test
             probs /= n_test
 
@@ -134,8 +104,6 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
             TARGETS.append(target.detach().cpu())
 
             loss = func2(logits, target)
-            # loss = criterion(logits, target)
-            # loss = criterion(logits, target.unsqueeze(1))
             val_loss.append(loss.detach().cpu().numpy())
             if get_output:
               bar.set_description("get_oof")
@@ -151,13 +119,11 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=1):
         return PROBS
     else:
         acc = (PROBS.argmax(1) == TARGETS).mean() * 100.
-        # auc = roc_auc_score((TARGETS==mel_idx).astype(float), PROBS[:, mel_idx])
-        auc = roc_auc_score(TARGETS.astype(float), PROBS)
-        # auc_20 = roc_auc_score((TARGETS[is_ext==0]==mel_idx).astype(float), PROBS[is_ext==0, mel_idx])
-        auc_20 = roc_auc_score((TARGETS[is_ext==0]).astype(float), PROBS[is_ext==0])
+        auc = func3(TARGETS,PROBS,mel_idx)
+        auc_20 = func4(TARGETS,PROBS,mel_idx,is_ext)
         return val_loss, acc, auc, auc_20
 
-def get_oof(df_train):
+def get_oof(df_train,mel_idx=6):
   PROBS = []
   oof = []
   for fold in range(kfold):
@@ -165,10 +131,13 @@ def get_oof(df_train):
     val_dataset = Albu_Dataset(df=df_valid, 
                                 phase="train", 
                                 transforms=Albu_Transform(image_size=image_size),
-                                aug=val_aug)
+                                aug=val_aug,
+                                use_meta=use_meta)
     val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)
-    model = Ef_Net()
+
+    n_meta_features =  val_dataset.n_meta_features #無理やり組み込んだ
+    model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
     model = model.to(device)
     model.load_state_dict(torch.load(model_path_fold_1))
     model.eval()
@@ -176,22 +145,24 @@ def get_oof(df_train):
     PROBS.append(this_PROBS)
     oof.append(df_valid)
   oof = pd.concat(oof).reset_index(drop=True)
-  # oof['pred'] = np.concatenate(PROBS).squeeze()[:, mel_idx]
-  oof['pred'] = np.concatenate(PROBS).squeeze()
+  func5(oof,PROBS,mel_idx)
   return oof
 
 
 def get_fold(df_train):
+  #ログのセット
   logger = setup_logger(LOG_DIR, LOG_NAME)
   config.log_config(logger)
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  logger.info("device_CPU_GPU:{}".format(device))
+  #初期化
   scores = []
   scores_20 = []
   PROBS = []
   dfs = []
 
   for fold in range(kfold):
+    if fold not in fold_list:
+      logger.info("Fold{0}はスキップされました".format(fold))
+      continue
     logger.info("{0}Fold{1}{2}".format("="*20,fold,"="*20))
     model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)  # Path and filename to save model to
     model_path_fold_2 = model_path + "_fold{}_2.pth".format(fold)  # Path and filename to save model to
@@ -200,12 +171,26 @@ def get_fold(df_train):
     val_auc_max = 0.
     val_auc_20_max = 0.
 
-    #損失関数のセット
-    # criterion = criterion
-    logger.info("criterion:{}".format(str(criterion)))
-
+    #kfoldの番号ふり
+    df_this = df_train[df_train["val_fold"] != fold]
+    df_valid = df_train[df_train["val_fold"] == fold]
+    #データセットインスタンスの生成
+    train_dataset = Albu_Dataset(df=df_this, 
+                            phase="train", 
+                            transforms=Albu_Transform(image_size=image_size),
+                            aug=train_aug,
+                            use_meta=use_meta)
+    val_dataset = Albu_Dataset(df=df_valid, 
+                            phase="train", 
+                            transforms=Albu_Transform(image_size=image_size),
+                            aug=val_aug,
+                            use_meta=use_meta)
+    #データローダーにセッット
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     #モデルクラスの読み込み
-    model = Ef_Net()
+    n_meta_features =  train_dataset.n_meta_features #無理やり組み込んだ
+    model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
     model = model.to(device)
     logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
 
@@ -215,20 +200,7 @@ def get_fold(df_train):
       model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
     scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='max', patience=1, verbose=True, factor=0.2)
     
-    df_this = df_train[df_train["val_fold"] != fold]
-    df_valid = df_train[df_train["val_fold"] == fold]
-    #データセットインスタンスの生成
-    train_dataset = Albu_Dataset(df=df_this, 
-                            phase="train", 
-                            transforms=Albu_Transform(image_size=image_size),
-                            aug=train_aug)
-    val_dataset = Albu_Dataset(df=df_valid, 
-                            phase="train", 
-                            transforms=Albu_Transform(image_size=image_size),
-                            aug=val_aug)
-    #データローダーにセッット
-    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+   
     #エポック
     for epoch in range(epochs):
       logger.info("{0} Epoch:{1}".format(time.ctime(),  epoch))
@@ -247,11 +219,13 @@ def get_fold(df_train):
 
       if val_auc > val_auc_max:
           logger.info('val_auc_max ({:.6f} --> {:.6f}). Saving model ...'.format(val_auc_max, val_auc))
+          logger.info("save_path={}".format(model_path_fold_1))
           val_auc_max = val_auc
           patience = es_patience  # Resetting patience since we have new best validation accuracy
           torch.save(model.state_dict(), model_path_fold_1)  # Saving current best model
       if val_auc_20 > val_auc_20_max:
           logger.info('val_auc_20_max ({:.6f} --> {:.6f}). Saving model ...'.format(val_auc_20_max, val_auc_20))
+          logger.info("save_path={}".format(model_path_fold_1))
           torch.save(model.state_dict(), model_path_fold_2)
           val_auc_20_max = val_auc_20
   
@@ -271,15 +245,15 @@ def run(df_train):
     oof_tocsv(oof)
     return oof
 
-    
-if __name__ == '__main__':
-    def parse_args():
-      parser = argparse.ArgumentParser()
-      parser.add_argument('arg1', help='df_train_path')
-      #入力されたものだけ回収
-      args, _ = parser.parse_known_args()
-      return args
+#実行関数
+def parse_args():
+  parser = argparse.ArgumentParser()
+  parser.add_argument('arg1', help='df_train_path')
+  #入力されたものだけ回収
+  args, _ = parser.parse_known_args()
+  return args
 
+if __name__ == '__main__':
     args = parse_args()
     df_train = pd.read_csv(args.arg1)
     run(df_train)
