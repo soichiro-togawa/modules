@@ -12,6 +12,8 @@ py_files = [__package__ +"."+s for s in py_files]
 #モジュール同士が読みあってる場合、二回回さないと更新されない場合がある
 for loop in range(2):
   for i in py_files:
+    if i in ["pytorch.scheduler"]: #読み込みを飛ばしたファイルを記述
+      continue
     a = importlib.import_module(i)
     # print(a.__name__)
     importlib.reload(a)

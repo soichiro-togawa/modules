@@ -2,9 +2,11 @@
 import numpy as np, pandas as pd
 import os,sys,argparse, warnings
 from tqdm import tqdm
+import torch, torch.nn as nn
 #自作モジュールの読み込み
 from pytorch.seed import seed_everything
 from pytorch import config
+from pytorch.branch_func import branch
 
 #コンフィグ
 data_dir1 = config.data_dir1
@@ -14,9 +16,12 @@ target = config.PREPROCESS_CONFIG["target"]
 extension = config.PREPROCESS_CONFIG["extension"]
 use_meta = config.PREPROCESS_CONFIG["use_meta"]
 use_external = config.PREPROCESS_CONFIG["use_external"]
+criterion = config.PREPROCESS_CONFIG["criterion"]
 #path
 df_train_preprocessed_path = config.PATH_CONFIG["df_train_preprocessed_path"]
 df_test_preprocessed_path = config.PATH_CONFIG["df_test_preprocessed_path"]
+#前段階=lossの種類による分岐
+func0,func1,func2,func3,func4,func5,func6 = branch(criterion)
 
 #関数
 def read_csv():
@@ -34,7 +39,7 @@ def read_csv():
     df_train2019["image_path"] = imfolder_train2019 + df_train2019[image_name] + extension
     return df_train,df_test,df_train2019
 
-def get_preprocess(df_train,df_test,df_train2,binary=True):
+def get_preprocess(df_train,df_test,df_train2):
     #工程１
     df_train = df_train[df_train['tfrecord'] != -1].reset_index(drop=True)
     df_train['fold'] = df_train['tfrecord'] % 5
@@ -71,8 +76,8 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
     diagnosis2idx = {d: idx for idx, d in enumerate(sorted(df_train.diagnosis.unique()))}
     print(diagnosis2idx)
     df_train[target] = df_train['diagnosis'].map(diagnosis2idx)
-    mel_idx = diagnosis2idx['melanoma']
-    print("mel_idx=",mel_idx)
+    target_index = diagnosis2idx['melanoma']
+    print("target_index=",target_index)
 
     #工程３
     if use_meta:
@@ -116,19 +121,14 @@ def get_preprocess(df_train,df_test,df_train2,binary=True):
         meta_features = ','.join(map(str, meta_features))
         df_train["meta"] = meta_features
         df_test["meta"] = meta_features
+        df_train["target_index"] = target_index
+        df_test["target_index"] = target_index
         # print("\n",n_meta_features,meta_features)
     else:
         n_meta_features = 0
 
-
     #二値モデル用
-    if binary:
-        bi_target = {
-            0:0, 1:0, 2:0,
-            3:0, 4:0, 5:0,
-            6:1, 7:0, 8:0}
-        df_train[target] = df_train[target].map(bi_target)
-        print(df_train["target"].value_counts())
+    df_train = func0(df_train,target)
     return df_train,df_test
 
 def df_tocsv(df_train,df_test):
@@ -136,11 +136,11 @@ def df_tocsv(df_train,df_test):
   df_test.to_csv(df_test_preprocessed_path, index=False)
 
 #実行関数
-def run(binary=True):
+def run():
   warnings.simplefilter('ignore')
   seed_everything(1)
-  a,b,c = read_csv()
-  df_train,df_test = get_preprocess(a,b,c,binary=binary)
+  df_train,df_test,df_train2019 = read_csv()
+  df_train,df_test = get_preprocess(df_train,df_test,df_train2019)
   df_tocsv(df_train,df_test)
   return df_train,df_test
 
@@ -155,6 +155,6 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     if args.arg1:
-      run(binary=args.arg1)
+      run()
     else:
       run(binary=True)

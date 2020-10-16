@@ -23,10 +23,10 @@ model_path, predict_path, LOG_DIR, LOG_NAME\
 = config.PATH_CONFIG["model_path"], config.PATH_CONFIG["predict_path"], config.PATH_CONFIG["LOG_DIR"], config.PATH_CONFIG["LOG_NAME"]
 
 #前段階=lossの種類による分岐
-func1,func2,func3,func4,func5,func6 = branch(criterion)
+func0,func1,func2,func3,func4,func5,func6 = branch(criterion)
 
 #関数
-def get_predict(df_test,mel_idx=6):
+def get_predict(df_test):
     print("device_CPU_GPU:", device)
     predict = torch.zeros((len(df_test), 1), dtype=torch.float32, device=device) 
     OUTPUTS = []
@@ -39,6 +39,7 @@ def get_predict(df_test,mel_idx=6):
         model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)
         print(model_path_fold_1)
         n_meta_features =  test_dataset.n_meta_features #無理やり組み込んだ
+        target_index = test_dataset.target_index #無理やり組み込んだ
         model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
         model = model.to(device)
         model.load_state_dict(torch.load(model_path_fold_1))
@@ -75,7 +76,7 @@ def get_predict(df_test,mel_idx=6):
 
         LOGITS = torch.cat(LOGITS).numpy()
         PROBS = torch.cat(PROBS).numpy()
-        func6(OUTPUTS,PROBS,mel_idx)
+        func6(OUTPUTS,PROBS,target_index)
     pred = np.zeros(OUTPUTS[0].shape[0])
     for probs in OUTPUTS:
       probs = np.squeeze(probs)

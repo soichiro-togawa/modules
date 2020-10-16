@@ -20,7 +20,9 @@ class Albu_Dataset(Dataset):
             temp = self.df.iloc[0,:]["meta"]
             temp = temp.split(",")
             self.meta_features = temp[:-1]
-            self.n_meta_features = int(temp[-1]) 
+            self.n_meta_features = int(temp[-1])
+            temp2 = self.df.iloc[0,:]["target_index"]
+            self.target_index = int(temp2) 
         else:
             self.n_meta_features =0
 

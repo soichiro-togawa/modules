@@ -33,7 +33,7 @@ if USE_AMP:
     from apex import amp, optimizers
 
 #前段階=lossの種類による分岐
-func1,func2,func3,func4,func5,func6 = branch(criterion)
+func0,func1,func2,func3,func4,func5,func6 = branch(criterion)
 
 #関数
 def get_val_fold(df_train):
@@ -70,7 +70,7 @@ def train_epoch(model, loader, optimizer,logger):
         bar.set_description('loss: %.5f, smth: %.5f' % (loss_np, smooth_loss))
     return train_loss
 
-def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=6):
+def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,target_index=6):
     model.eval()
     val_loss = []
     LOGITS = []
@@ -119,11 +119,11 @@ def val_epoch(model, loader, is_ext=None, n_test=1, get_output=False,mel_idx=6):
         return PROBS
     else:
         acc = (PROBS.argmax(1) == TARGETS).mean() * 100.
-        auc = func3(TARGETS,PROBS,mel_idx)
-        auc_20 = func4(TARGETS,PROBS,mel_idx,is_ext)
+        auc = func3(TARGETS,PROBS,target_index)
+        auc_20 = func4(TARGETS,PROBS,target_index,is_ext)
         return val_loss, acc, auc, auc_20
 
-def get_oof(df_train,mel_idx=6):
+def get_oof(df_train):
   PROBS = []
   oof = []
   for fold in range(kfold):
@@ -137,6 +137,7 @@ def get_oof(df_train,mel_idx=6):
     model_path_fold_1 = model_path + "_fold{}_1.pth".format(fold)
 
     n_meta_features =  val_dataset.n_meta_features #無理やり組み込んだ
+    target_index = val_dataset.target_index #無理やり組み込んだ
     model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
     model = model.to(device)
     model.load_state_dict(torch.load(model_path_fold_1))
@@ -145,7 +146,7 @@ def get_oof(df_train,mel_idx=6):
     PROBS.append(this_PROBS)
     oof.append(df_valid)
   oof = pd.concat(oof).reset_index(drop=True)
-  func5(oof,PROBS,mel_idx)
+  func5(oof,PROBS,target_index)
   return oof
 
 
@@ -190,6 +191,7 @@ def get_fold(df_train):
     val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     #モデルクラスの読み込み
     n_meta_features =  train_dataset.n_meta_features #無理やり組み込んだ
+    target_index = train_dataset.target_index #無理やり組み込んだ
     model = Ef_Net(n_meta_features=n_meta_features, out_features=out_features)
     model = model.to(device)
     logger.info("device_GPU_True:{}".format(next(model.parameters()).is_cuda))
@@ -205,7 +207,7 @@ def get_fold(df_train):
     for epoch in range(epochs):
       logger.info("{0} Epoch:{1}".format(time.ctime(),  epoch))
       train_loss = train_epoch(model, train_loader, optimizer,logger)
-      val_loss, acc, val_auc, val_auc_20 = val_epoch(model, val_loader, is_ext=df_valid['is_ext'].values)
+      val_loss, acc, val_auc, val_auc_20 = val_epoch(model, val_loader, is_ext=df_valid['is_ext'].values, target_index=target_index)
       content = time.ctime() + ' ' + f'Fold {fold}, Epoch {epoch}, lr: {optimizer.param_groups[0]["lr"]:.7f}, train loss: {np.mean(train_loss):.5f}, valid loss: {(val_loss):.5f}, acc: {(acc):.4f}, val_auc: {(val_auc):.6f}, val_auc_20: {(val_auc_20):.6f}.'
       logger.info(content)
       

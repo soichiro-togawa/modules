@@ -4,22 +4,23 @@ data_dir1="/content/image/"
 data_dir2="/content/image_2019/"
 
 #preprocess.py
+import torch, torch.nn as nn
 PREPROCESS_CONFIG ={
 "image_name": "image_name",
 "target": "target",
 "extension": ".jpg",
 "use_meta": True,
 "use_external": True,
+"criterion": nn.BCEWithLogitsLoss(),
+"criterion": nn.CrossEntropyLoss(),
 }
 
 #model.py
-import torch, torch.nn as nn
 MODEL_CONFIG ={
 "b_num": "b1",
 "out_features": 1,
 "out_features": 9,
-"criterion": nn.BCEWithLogitsLoss(),
-"criterion": nn.CrossEntropyLoss(),
+"criterion": PREPROCESS_CONFIG["criterion"],
 "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 #既出
 "use_meta": PREPROCESS_CONFIG["use_meta"],
