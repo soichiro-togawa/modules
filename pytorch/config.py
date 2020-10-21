@@ -54,7 +54,7 @@ PATH_CONFIG ={
 "oof_path": "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/",
 "predict_path": "/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/",
 #log
-"LOG_DIR": "/content/drive/My Drive/Pipeline/output_dir/",
+"LOG_DIR": "/content/drive/My Drive/Pipeline/_output_dir/",
 }
 PATH_CONFIG["model_name"] ="ef{0}_im{1}_amp{2}_ver{3}".format(MODEL_CONFIG["b_num"],TRAIN_CONFIG["image_size"],TRAIN_CONFIG["USE_AMP"],PATH_CONFIG["VERSION"])
 PATH_CONFIG["LOG_NAME"] ="training_log_" + PATH_CONFIG["model_name"]

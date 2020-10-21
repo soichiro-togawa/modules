@@ -1,0 +1,5 @@
+#フォルダ及び中身は要らない
+__pycache__/
+.ipynb_checkpoints/
+_output_dir/
+00pipelineの使用とパスについて.txt

@@ -17,7 +17,7 @@ from pytorch.model import Ef_Net
 from pytorch.seed import seed_everything
 from pytorch import config
 from pytorch.branch_func import branch
-from make_log import setup_logger
+from make_log.make_log import setup_logger
 
 #コンフィグ
 DEBUG, USE_AMP, image_size, epochs, es_patience, batch_size, num_workers, kfold, fold_list, train_aug, val_aug, n_val\

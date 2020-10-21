@@ -1,0 +1,5 @@
+# s3➡ec2ファイルダウンロード
+aws s3 cp s3://your-bucket/hosts.txt /tmp/hosts.txt
+
+# s3バケット➡s3s3バケット
+aws s3 cp s3://mabe-rakus/backup/train.csv s3://nakayama-rakus/data/
