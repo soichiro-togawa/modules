@@ -2,8 +2,11 @@
 cd "/mnt/d/Google ドライブ/Pipeline"
 source "/mnt/d/Google ドライブ/00Colab Notebooks/00Commands/03SCRIPTkey/github.txt"
 git checkout master
+#gitignoreにtxtついてないか注意
+git rm -r --cached .
 git add -A
 git commit -m "script_push"
+
 
 expect -c "
 set timeout 5
