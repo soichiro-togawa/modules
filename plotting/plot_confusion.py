@@ -1,3 +1,7 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
 def plot_confusion_matrix(y_train,y_train_pred_numpy,df_train,df_test):
   y_pred_classes_train = np.argmax(y_train_pred_numpy,axis = 1) 
   y_true = np.argmax(y_train,axis = 1) 
@@ -37,4 +41,5 @@ def plot_confusion_matrix(y_train,y_train_pred_numpy,df_train,df_test):
   plot_confusion_matrix(confusion_mtx, classes = range(target_classes))
 
 #実行
-plot_confusion_matrix(y_val,y_val_pred,df_train,df_test)
+# !python -m plotting.plot_confusion
+# plot_confusion_matrix(y_val,y_val_pred,df_train,df_test)
