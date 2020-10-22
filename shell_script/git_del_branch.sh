@@ -22,4 +22,4 @@ interact
 git checkout master
 
 #使い方
-# source "/mnt/d/Google ドライブ/Pipeline/shell_script/git_push_master.sh"
+# source "/mnt/d/Google ドライブ/Pipeline/shell_script/git_del_branch.sh"
