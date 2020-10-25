@@ -1,0 +1,289 @@
+2020-10-14 22:13:43,566 - INFO - logger set up
+2020-10-14 22:13:43,570 - INFO - #####Print_Config######
+2020-10-14 22:13:43,571 - INFO - {'image_name': 'image_name', 'target': 'target', 'extension': '.jpg', 'use_meta': True, 'use_external': True}
+2020-10-14 22:13:43,572 - INFO - {'b_num': 'b1', 'out_features': 1, 'criterion': BCEWithLogitsLoss(), 'device': device(type='cuda'), 'use_meta': True}
+2020-10-14 22:13:43,573 - INFO - {'DEBUG': False, 'USE_AMP': True, 'image_size': 256, 'epochs': 12, 'es_patience': 3, 'batch_size': 64, 'num_workers': 8, 'kfold': 5, 'train_aug': True, 'val_aug': False, 'test_aug': False, 'n_val': 8, 'TTA': 12, 'use_meta': True, 'target': 'target', 'out_features': 1, 'criterion': BCEWithLogitsLoss(), 'device': device(type='cuda')}
+2020-10-14 22:13:43,575 - INFO - ----------------path------------------
+2020-10-14 22:13:43,576 - INFO - {'df_train_preprocessed_path': '/content/df_train.csv', 'df_test_preprocessed_path': '/content/df_test.csv', 'VERSION': 1, 'model_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1', 'oof_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/efb1_im256_ampTrue_ver1.csv', 'predict_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/efb1_im256_ampTrue_ver1.csv', 'LOG_DIR': '/content/drive/My Drive/Pipeline/output_dir/', 'model_name': 'efb1_im256_ampTrue_ver1', 'LOG_NAME': 'training_log_efb1_im256_ampTrue_ver1'}
+2020-10-14 22:13:43,578 - INFO - model_path_exist:True
+2020-10-14 22:13:43,580 - INFO - oof_path_exist:True
+2020-10-14 22:13:43,582 - INFO - predict_path_exist:True
+2020-10-14 22:13:43,583 - INFO - LOG_DIR_exist:True
+2020-10-14 22:13:43,585 - INFO - #####END######
+2020-10-14 22:13:43,586 - INFO - ====================Fold0====================
+2020-10-14 22:13:56,160 - INFO - device_GPU_True:True
+2020-10-14 22:13:56,172 - INFO - Wed Oct 14 13:13:56 2020 Epoch:0
+2020-10-14 22:23:43,727 - INFO - Wed Oct 14 13:23:43 2020 Fold 0, Epoch 0, lr: 0.0010000, train loss: 0.21707, valid loss: 0.20149, acc: 91.2188, val_auc: 0.896416, val_auc_20: 0.839662.
+2020-10-14 22:23:43,728 - INFO - val_auc_max (0.000000 --> 0.896416). Saving model ...
+2020-10-14 22:23:43,730 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 22:23:43,873 - INFO - val_auc_20_max (0.000000 --> 0.839662). Saving model ...
+2020-10-14 22:23:43,875 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 22:23:44,001 - INFO - Wed Oct 14 13:23:43 2020 Epoch:1
+2020-10-14 22:33:37,097 - INFO - Wed Oct 14 13:33:37 2020 Fold 0, Epoch 1, lr: 0.0010000, train loss: 0.20175, valid loss: 0.21229, acc: 91.2188, val_auc: 0.912939, val_auc_20: 0.850015.
+2020-10-14 22:33:37,099 - INFO - val_auc_max (0.896416 --> 0.912939). Saving model ...
+2020-10-14 22:33:37,101 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 22:33:37,300 - INFO - val_auc_20_max (0.839662 --> 0.850015). Saving model ...
+2020-10-14 22:33:37,302 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 22:33:37,465 - INFO - Wed Oct 14 13:33:37 2020 Epoch:2
+2020-10-14 22:43:36,091 - INFO - Wed Oct 14 13:43:36 2020 Fold 0, Epoch 2, lr: 0.0010000, train loss: 0.19752, valid loss: 0.18828, acc: 91.2188, val_auc: 0.906249, val_auc_20: 0.843743.
+2020-10-14 22:43:36,092 - INFO - Wed Oct 14 13:43:36 2020 Epoch:3
+2020-10-14 22:53:29,338 - INFO - Wed Oct 14 13:53:29 2020 Fold 0, Epoch 3, lr: 0.0010000, train loss: 0.19368, valid loss: 0.18882, acc: 91.2188, val_auc: 0.904554, val_auc_20: 0.820161.
+2020-10-14 22:53:29,340 - INFO - Wed Oct 14 13:53:29 2020 Epoch:4
+2020-10-14 23:03:22,123 - INFO - Wed Oct 14 14:03:22 2020 Fold 0, Epoch 4, lr: 0.0002000, train loss: 0.18423, valid loss: 0.16616, acc: 91.2188, val_auc: 0.925249, val_auc_20: 0.883947.
+2020-10-14 23:03:22,124 - INFO - val_auc_max (0.912939 --> 0.925249). Saving model ...
+2020-10-14 23:03:22,126 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:03:22,275 - INFO - val_auc_20_max (0.850015 --> 0.883947). Saving model ...
+2020-10-14 23:03:22,277 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:03:22,423 - INFO - Wed Oct 14 14:03:22 2020 Epoch:5
+2020-10-14 23:13:12,460 - INFO - Wed Oct 14 14:13:12 2020 Fold 0, Epoch 5, lr: 0.0002000, train loss: 0.17745, valid loss: 0.16781, acc: 91.2188, val_auc: 0.927267, val_auc_20: 0.890038.
+2020-10-14 23:13:12,462 - INFO - val_auc_max (0.925249 --> 0.927267). Saving model ...
+2020-10-14 23:13:12,463 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:13:12,605 - INFO - val_auc_20_max (0.883947 --> 0.890038). Saving model ...
+2020-10-14 23:13:12,606 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:13:12,740 - INFO - Wed Oct 14 14:13:12 2020 Epoch:6
+2020-10-14 23:22:46,355 - INFO - Wed Oct 14 14:22:46 2020 Fold 0, Epoch 6, lr: 0.0002000, train loss: 0.17378, valid loss: 0.16405, acc: 91.2188, val_auc: 0.927419, val_auc_20: 0.895009.
+2020-10-14 23:22:46,356 - INFO - val_auc_max (0.927267 --> 0.927419). Saving model ...
+2020-10-14 23:22:46,358 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:22:46,505 - INFO - val_auc_20_max (0.890038 --> 0.895009). Saving model ...
+2020-10-14 23:22:46,507 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:22:46,653 - INFO - Wed Oct 14 14:22:46 2020 Epoch:7
+2020-10-14 23:32:26,841 - INFO - Wed Oct 14 14:32:26 2020 Fold 0, Epoch 7, lr: 0.0002000, train loss: 0.17076, valid loss: 0.16242, acc: 91.2188, val_auc: 0.932215, val_auc_20: 0.894235.
+2020-10-14 23:32:26,843 - INFO - val_auc_max (0.927419 --> 0.932215). Saving model ...
+2020-10-14 23:32:26,844 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:32:26,985 - INFO - Wed Oct 14 14:32:26 2020 Epoch:8
+2020-10-14 23:42:16,287 - INFO - Wed Oct 14 14:42:16 2020 Fold 0, Epoch 8, lr: 0.0002000, train loss: 0.16803, valid loss: 0.15873, acc: 91.2188, val_auc: 0.935149, val_auc_20: 0.901964.
+2020-10-14 23:42:16,289 - INFO - val_auc_max (0.932215 --> 0.935149). Saving model ...
+2020-10-14 23:42:16,291 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:42:16,434 - INFO - val_auc_20_max (0.895009 --> 0.901964). Saving model ...
+2020-10-14 23:42:16,435 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:42:16,574 - INFO - Wed Oct 14 14:42:16 2020 Epoch:9
+2020-10-14 23:52:16,654 - INFO - Wed Oct 14 14:52:16 2020 Fold 0, Epoch 9, lr: 0.0002000, train loss: 0.16702, valid loss: 0.15707, acc: 91.2188, val_auc: 0.935193, val_auc_20: 0.894665.
+2020-10-14 23:52:16,656 - INFO - val_auc_max (0.935149 --> 0.935193). Saving model ...
+2020-10-14 23:52:16,657 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-14 23:52:16,795 - INFO - Wed Oct 14 14:52:16 2020 Epoch:10
+2020-10-15 00:02:18,640 - INFO - Wed Oct 14 15:02:18 2020 Fold 0, Epoch 10, lr: 0.0002000, train loss: 0.16524, valid loss: 0.15421, acc: 91.2188, val_auc: 0.937121, val_auc_20: 0.898346.
+2020-10-15 00:02:18,642 - INFO - val_auc_max (0.935193 --> 0.937121). Saving model ...
+2020-10-15 00:02:18,643 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-15 00:02:18,783 - INFO - Wed Oct 14 15:02:18 2020 Epoch:11
+2020-10-15 00:12:18,542 - INFO - Wed Oct 14 15:12:18 2020 Fold 0, Epoch 11, lr: 0.0002000, train loss: 0.16500, valid loss: 0.15823, acc: 91.2188, val_auc: 0.936710, val_auc_20: 0.902172.
+2020-10-15 00:12:18,544 - INFO - val_auc_20_max (0.901964 --> 0.902172). Saving model ...
+2020-10-15 00:12:18,545 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold0_1.pth
+2020-10-15 00:12:18,697 - INFO - ====================Fold1====================
+2020-10-15 00:12:18,910 - INFO - device_GPU_True:True
+2020-10-15 00:12:18,924 - INFO - Wed Oct 14 15:12:18 2020 Epoch:0
+2020-10-15 00:22:13,006 - INFO - Wed Oct 14 15:22:13 2020 Fold 1, Epoch 0, lr: 0.0010000, train loss: 0.21694, valid loss: 0.19133, acc: 91.2188, val_auc: 0.907644, val_auc_20: 0.810700.
+2020-10-15 00:22:13,008 - INFO - val_auc_max (0.000000 --> 0.907644). Saving model ...
+2020-10-15 00:22:13,009 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:22:13,165 - INFO - val_auc_20_max (0.000000 --> 0.810700). Saving model ...
+2020-10-15 00:22:13,166 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:22:13,301 - INFO - Wed Oct 14 15:22:13 2020 Epoch:1
+2020-10-15 00:32:08,502 - INFO - Wed Oct 14 15:32:08 2020 Fold 1, Epoch 1, lr: 0.0010000, train loss: 0.20008, valid loss: 0.18484, acc: 91.2188, val_auc: 0.908210, val_auc_20: 0.854315.
+2020-10-15 00:32:08,504 - INFO - val_auc_max (0.907644 --> 0.908210). Saving model ...
+2020-10-15 00:32:08,505 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:32:08,658 - INFO - val_auc_20_max (0.810700 --> 0.854315). Saving model ...
+2020-10-15 00:32:08,662 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:32:08,805 - INFO - Wed Oct 14 15:32:08 2020 Epoch:2
+2020-10-15 00:42:01,228 - INFO - Wed Oct 14 15:42:01 2020 Fold 1, Epoch 2, lr: 0.0010000, train loss: 0.19750, valid loss: 0.18371, acc: 91.2188, val_auc: 0.908592, val_auc_20: 0.821267.
+2020-10-15 00:42:01,229 - INFO - val_auc_max (0.908210 --> 0.908592). Saving model ...
+2020-10-15 00:42:01,230 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:42:01,367 - INFO - Wed Oct 14 15:42:01 2020 Epoch:3
+2020-10-15 00:51:53,793 - INFO - Wed Oct 14 15:51:53 2020 Fold 1, Epoch 3, lr: 0.0010000, train loss: 0.19205, valid loss: 0.17702, acc: 91.2188, val_auc: 0.918796, val_auc_20: 0.868120.
+2020-10-15 00:51:53,794 - INFO - val_auc_max (0.908592 --> 0.918796). Saving model ...
+2020-10-15 00:51:53,796 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:51:53,972 - INFO - val_auc_20_max (0.854315 --> 0.868120). Saving model ...
+2020-10-15 00:51:53,973 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 00:51:54,121 - INFO - Wed Oct 14 15:51:54 2020 Epoch:4
+2020-10-15 01:01:47,048 - INFO - Wed Oct 14 16:01:47 2020 Fold 1, Epoch 4, lr: 0.0010000, train loss: 0.19014, valid loss: 0.18588, acc: 91.2188, val_auc: 0.918317, val_auc_20: 0.853103.
+2020-10-15 01:01:47,049 - INFO - Wed Oct 14 16:01:47 2020 Epoch:5
+2020-10-15 01:11:31,590 - INFO - Wed Oct 14 16:11:31 2020 Fold 1, Epoch 5, lr: 0.0010000, train loss: 0.18716, valid loss: 0.17480, acc: 91.2188, val_auc: 0.921946, val_auc_20: 0.862592.
+2020-10-15 01:11:31,591 - INFO - val_auc_max (0.918796 --> 0.921946). Saving model ...
+2020-10-15 01:11:31,593 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 01:11:31,730 - INFO - Wed Oct 14 16:11:31 2020 Epoch:6
+2020-10-15 01:21:04,435 - INFO - Wed Oct 14 16:21:04 2020 Fold 1, Epoch 6, lr: 0.0010000, train loss: 0.18532, valid loss: 0.17626, acc: 91.2188, val_auc: 0.918164, val_auc_20: 0.846516.
+2020-10-15 01:21:04,436 - INFO - Wed Oct 14 16:21:04 2020 Epoch:7
+2020-10-15 01:30:40,504 - INFO - Wed Oct 14 16:30:40 2020 Fold 1, Epoch 7, lr: 0.0010000, train loss: 0.18396, valid loss: 0.17422, acc: 91.2188, val_auc: 0.924500, val_auc_20: 0.829848.
+2020-10-15 01:30:40,505 - INFO - val_auc_max (0.921946 --> 0.924500). Saving model ...
+2020-10-15 01:30:40,507 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 01:30:40,652 - INFO - Wed Oct 14 16:30:40 2020 Epoch:8
+2020-10-15 01:40:20,688 - INFO - Wed Oct 14 16:40:20 2020 Fold 1, Epoch 8, lr: 0.0010000, train loss: 0.18108, valid loss: 0.17305, acc: 91.2188, val_auc: 0.919506, val_auc_20: 0.857855.
+2020-10-15 01:40:20,689 - INFO - Wed Oct 14 16:40:20 2020 Epoch:9
+2020-10-15 01:49:47,010 - INFO - Wed Oct 14 16:49:47 2020 Fold 1, Epoch 9, lr: 0.0010000, train loss: 0.17921, valid loss: 0.16541, acc: 91.2188, val_auc: 0.924931, val_auc_20: 0.842821.
+2020-10-15 01:49:47,011 - INFO - val_auc_max (0.924500 --> 0.924931). Saving model ...
+2020-10-15 01:49:47,013 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 01:49:47,172 - INFO - Wed Oct 14 16:49:47 2020 Epoch:10
+2020-10-15 01:59:18,361 - INFO - Wed Oct 14 16:59:18 2020 Fold 1, Epoch 10, lr: 0.0010000, train loss: 0.17924, valid loss: 0.16349, acc: 91.2188, val_auc: 0.925225, val_auc_20: 0.831390.
+2020-10-15 01:59:18,362 - INFO - val_auc_max (0.924931 --> 0.925225). Saving model ...
+2020-10-15 01:59:18,363 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 01:59:18,507 - INFO - Wed Oct 14 16:59:18 2020 Epoch:11
+2020-10-15 02:08:56,441 - INFO - Wed Oct 14 17:08:56 2020 Fold 1, Epoch 11, lr: 0.0010000, train loss: 0.17594, valid loss: 0.16304, acc: 91.2188, val_auc: 0.929228, val_auc_20: 0.855470.
+2020-10-15 02:08:56,443 - INFO - val_auc_max (0.925225 --> 0.929228). Saving model ...
+2020-10-15 02:08:56,445 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold1_1.pth
+2020-10-15 02:08:56,599 - INFO - ====================Fold2====================
+2020-10-15 02:08:56,804 - INFO - device_GPU_True:True
+2020-10-15 02:08:56,815 - INFO - Wed Oct 14 17:08:56 2020 Epoch:0
+2020-10-15 02:18:38,908 - INFO - Wed Oct 14 17:18:38 2020 Fold 2, Epoch 0, lr: 0.0010000, train loss: 0.21582, valid loss: 0.20017, acc: 91.2188, val_auc: 0.889386, val_auc_20: 0.818784.
+2020-10-15 02:18:38,909 - INFO - val_auc_max (0.000000 --> 0.889386). Saving model ...
+2020-10-15 02:18:38,910 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:18:39,050 - INFO - val_auc_20_max (0.000000 --> 0.818784). Saving model ...
+2020-10-15 02:18:39,051 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:18:39,189 - INFO - Wed Oct 14 17:18:39 2020 Epoch:1
+2020-10-15 02:28:28,902 - INFO - Wed Oct 14 17:28:28 2020 Fold 2, Epoch 1, lr: 0.0010000, train loss: 0.20085, valid loss: 0.20514, acc: 91.2188, val_auc: 0.900250, val_auc_20: 0.815071.
+2020-10-15 02:28:28,903 - INFO - val_auc_max (0.889386 --> 0.900250). Saving model ...
+2020-10-15 02:28:28,904 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:28:29,052 - INFO - Wed Oct 14 17:28:29 2020 Epoch:2
+2020-10-15 02:38:03,941 - INFO - Wed Oct 14 17:38:03 2020 Fold 2, Epoch 2, lr: 0.0010000, train loss: 0.19658, valid loss: 0.17977, acc: 91.2188, val_auc: 0.912426, val_auc_20: 0.871154.
+2020-10-15 02:38:03,942 - INFO - val_auc_max (0.900250 --> 0.912426). Saving model ...
+2020-10-15 02:38:03,943 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:38:04,079 - INFO - val_auc_20_max (0.818784 --> 0.871154). Saving model ...
+2020-10-15 02:38:04,083 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:38:04,224 - INFO - Wed Oct 14 17:38:04 2020 Epoch:3
+2020-10-15 02:47:50,151 - INFO - Wed Oct 14 17:47:50 2020 Fold 2, Epoch 3, lr: 0.0010000, train loss: 0.19291, valid loss: 0.19304, acc: 91.2188, val_auc: 0.891054, val_auc_20: 0.836497.
+2020-10-15 02:47:50,153 - INFO - Wed Oct 14 17:47:50 2020 Epoch:4
+2020-10-15 02:57:40,636 - INFO - Wed Oct 14 17:57:40 2020 Fold 2, Epoch 4, lr: 0.0010000, train loss: 0.19058, valid loss: 0.19639, acc: 91.2188, val_auc: 0.914693, val_auc_20: 0.883361.
+2020-10-15 02:57:40,637 - INFO - val_auc_max (0.912426 --> 0.914693). Saving model ...
+2020-10-15 02:57:40,638 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:57:40,777 - INFO - val_auc_20_max (0.871154 --> 0.883361). Saving model ...
+2020-10-15 02:57:40,779 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 02:57:40,918 - INFO - Wed Oct 14 17:57:40 2020 Epoch:5
+2020-10-15 03:07:25,764 - INFO - Wed Oct 14 18:07:25 2020 Fold 2, Epoch 5, lr: 0.0010000, train loss: 0.18804, valid loss: 0.18172, acc: 91.2188, val_auc: 0.921396, val_auc_20: 0.891880.
+2020-10-15 03:07:25,766 - INFO - val_auc_max (0.914693 --> 0.921396). Saving model ...
+2020-10-15 03:07:25,767 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:07:25,907 - INFO - val_auc_20_max (0.883361 --> 0.891880). Saving model ...
+2020-10-15 03:07:25,908 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:07:26,043 - INFO - Wed Oct 14 18:07:26 2020 Epoch:6
+2020-10-15 03:17:17,993 - INFO - Wed Oct 14 18:17:17 2020 Fold 2, Epoch 6, lr: 0.0010000, train loss: 0.18500, valid loss: 0.18158, acc: 91.2188, val_auc: 0.915605, val_auc_20: 0.877470.
+2020-10-15 03:17:17,994 - INFO - Wed Oct 14 18:17:17 2020 Epoch:7
+2020-10-15 03:27:04,360 - INFO - Wed Oct 14 18:27:04 2020 Fold 2, Epoch 7, lr: 0.0010000, train loss: 0.18280, valid loss: 0.17412, acc: 91.2188, val_auc: 0.919619, val_auc_20: 0.886273.
+2020-10-15 03:27:04,361 - INFO - Wed Oct 14 18:27:04 2020 Epoch:8
+2020-10-15 03:36:42,819 - INFO - Wed Oct 14 18:36:42 2020 Fold 2, Epoch 8, lr: 0.0002000, train loss: 0.17360, valid loss: 0.15861, acc: 91.2188, val_auc: 0.930551, val_auc_20: 0.893145.
+2020-10-15 03:36:42,820 - INFO - val_auc_max (0.921396 --> 0.930551). Saving model ...
+2020-10-15 03:36:42,822 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:36:42,960 - INFO - val_auc_20_max (0.891880 --> 0.893145). Saving model ...
+2020-10-15 03:36:42,961 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:36:43,106 - INFO - Wed Oct 14 18:36:43 2020 Epoch:9
+2020-10-15 03:46:09,467 - INFO - Wed Oct 14 18:46:09 2020 Fold 2, Epoch 9, lr: 0.0002000, train loss: 0.16704, valid loss: 0.15647, acc: 91.2188, val_auc: 0.933094, val_auc_20: 0.897617.
+2020-10-15 03:46:09,469 - INFO - val_auc_max (0.930551 --> 0.933094). Saving model ...
+2020-10-15 03:46:09,470 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:46:09,613 - INFO - val_auc_20_max (0.893145 --> 0.897617). Saving model ...
+2020-10-15 03:46:09,615 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:46:09,753 - INFO - Wed Oct 14 18:46:09 2020 Epoch:10
+2020-10-15 03:55:32,532 - INFO - Wed Oct 14 18:55:32 2020 Fold 2, Epoch 10, lr: 0.0002000, train loss: 0.16520, valid loss: 0.15936, acc: 91.2188, val_auc: 0.933576, val_auc_20: 0.900313.
+2020-10-15 03:55:32,533 - INFO - val_auc_max (0.933094 --> 0.933576). Saving model ...
+2020-10-15 03:55:32,534 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:55:32,684 - INFO - val_auc_20_max (0.897617 --> 0.900313). Saving model ...
+2020-10-15 03:55:32,689 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 03:55:32,836 - INFO - Wed Oct 14 18:55:32 2020 Epoch:11
+2020-10-15 04:05:16,538 - INFO - Wed Oct 14 19:05:16 2020 Fold 2, Epoch 11, lr: 0.0002000, train loss: 0.16398, valid loss: 0.15334, acc: 91.2188, val_auc: 0.937802, val_auc_20: 0.913479.
+2020-10-15 04:05:16,539 - INFO - val_auc_max (0.933576 --> 0.937802). Saving model ...
+2020-10-15 04:05:16,541 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 04:05:16,686 - INFO - val_auc_20_max (0.900313 --> 0.913479). Saving model ...
+2020-10-15 04:05:16,688 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold2_1.pth
+2020-10-15 04:05:16,839 - INFO - ====================Fold3====================
+2020-10-15 04:05:17,050 - INFO - device_GPU_True:True
+2020-10-15 04:05:17,067 - INFO - Wed Oct 14 19:05:17 2020 Epoch:0
+2020-10-15 04:15:09,020 - INFO - Wed Oct 14 19:15:09 2020 Fold 3, Epoch 0, lr: 0.0010000, train loss: 0.21558, valid loss: 0.19246, acc: 91.2188, val_auc: 0.898045, val_auc_20: 0.798616.
+2020-10-15 04:15:09,021 - INFO - val_auc_max (0.000000 --> 0.898045). Saving model ...
+2020-10-15 04:15:09,022 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:15:09,236 - INFO - val_auc_20_max (0.000000 --> 0.798616). Saving model ...
+2020-10-15 04:15:09,240 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:15:09,397 - INFO - Wed Oct 14 19:15:09 2020 Epoch:1
+2020-10-15 04:25:00,623 - INFO - Wed Oct 14 19:25:00 2020 Fold 3, Epoch 1, lr: 0.0010000, train loss: 0.20102, valid loss: 0.20058, acc: 91.2188, val_auc: 0.901240, val_auc_20: 0.844090.
+2020-10-15 04:25:00,625 - INFO - val_auc_max (0.898045 --> 0.901240). Saving model ...
+2020-10-15 04:25:00,626 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:25:00,772 - INFO - val_auc_20_max (0.798616 --> 0.844090). Saving model ...
+2020-10-15 04:25:00,773 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:25:00,914 - INFO - Wed Oct 14 19:25:00 2020 Epoch:2
+2020-10-15 04:34:47,554 - INFO - Wed Oct 14 19:34:47 2020 Fold 3, Epoch 2, lr: 0.0010000, train loss: 0.19565, valid loss: 0.18900, acc: 91.2188, val_auc: 0.911477, val_auc_20: 0.867034.
+2020-10-15 04:34:47,555 - INFO - val_auc_max (0.901240 --> 0.911477). Saving model ...
+2020-10-15 04:34:47,556 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:34:47,702 - INFO - val_auc_20_max (0.844090 --> 0.867034). Saving model ...
+2020-10-15 04:34:47,704 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 04:34:47,847 - INFO - Wed Oct 14 19:34:47 2020 Epoch:3
+2020-10-15 04:44:38,534 - INFO - Wed Oct 14 19:44:38 2020 Fold 3, Epoch 3, lr: 0.0010000, train loss: 0.19157, valid loss: 0.20074, acc: 91.2188, val_auc: 0.902599, val_auc_20: 0.857123.
+2020-10-15 04:44:38,535 - INFO - Wed Oct 14 19:44:38 2020 Epoch:4
+2020-10-15 04:54:24,486 - INFO - Wed Oct 14 19:54:24 2020 Fold 3, Epoch 4, lr: 0.0010000, train loss: 0.18980, valid loss: 0.18396, acc: 91.2188, val_auc: 0.909121, val_auc_20: 0.833567.
+2020-10-15 04:54:24,488 - INFO - Wed Oct 14 19:54:24 2020 Epoch:5
+2020-10-15 05:04:12,219 - INFO - Wed Oct 14 20:04:12 2020 Fold 3, Epoch 5, lr: 0.0002000, train loss: 0.17696, valid loss: 0.16916, acc: 91.2188, val_auc: 0.924639, val_auc_20: 0.861630.
+2020-10-15 05:04:12,221 - INFO - val_auc_max (0.911477 --> 0.924639). Saving model ...
+2020-10-15 05:04:12,222 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:04:12,366 - INFO - Wed Oct 14 20:04:12 2020 Epoch:6
+2020-10-15 05:14:12,289 - INFO - Wed Oct 14 20:14:12 2020 Fold 3, Epoch 6, lr: 0.0002000, train loss: 0.17184, valid loss: 0.16418, acc: 91.2188, val_auc: 0.927741, val_auc_20: 0.859844.
+2020-10-15 05:14:12,290 - INFO - val_auc_max (0.924639 --> 0.927741). Saving model ...
+2020-10-15 05:14:12,291 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:14:12,447 - INFO - Wed Oct 14 20:14:12 2020 Epoch:7
+2020-10-15 05:24:10,614 - INFO - Wed Oct 14 20:24:10 2020 Fold 3, Epoch 7, lr: 0.0002000, train loss: 0.16960, valid loss: 0.16278, acc: 91.2188, val_auc: 0.929743, val_auc_20: 0.867835.
+2020-10-15 05:24:10,616 - INFO - val_auc_max (0.927741 --> 0.929743). Saving model ...
+2020-10-15 05:24:10,618 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:24:10,758 - INFO - val_auc_20_max (0.867034 --> 0.867835). Saving model ...
+2020-10-15 05:24:10,761 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:24:10,891 - INFO - Wed Oct 14 20:24:10 2020 Epoch:8
+2020-10-15 05:34:12,259 - INFO - Wed Oct 14 20:34:12 2020 Fold 3, Epoch 8, lr: 0.0002000, train loss: 0.16605, valid loss: 0.16094, acc: 91.2188, val_auc: 0.930974, val_auc_20: 0.872308.
+2020-10-15 05:34:12,262 - INFO - val_auc_max (0.929743 --> 0.930974). Saving model ...
+2020-10-15 05:34:12,264 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:34:12,405 - INFO - val_auc_20_max (0.867835 --> 0.872308). Saving model ...
+2020-10-15 05:34:12,406 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:34:12,545 - INFO - Wed Oct 14 20:34:12 2020 Epoch:9
+2020-10-15 05:44:07,894 - INFO - Wed Oct 14 20:44:07 2020 Fold 3, Epoch 9, lr: 0.0002000, train loss: 0.16540, valid loss: 0.15983, acc: 91.2188, val_auc: 0.929890, val_auc_20: 0.863782.
+2020-10-15 05:44:07,895 - INFO - Wed Oct 14 20:44:07 2020 Epoch:10
+2020-10-15 05:54:02,589 - INFO - Wed Oct 14 20:54:02 2020 Fold 3, Epoch 10, lr: 0.0002000, train loss: 0.16256, valid loss: 0.15804, acc: 91.2188, val_auc: 0.933111, val_auc_20: 0.864241.
+2020-10-15 05:54:02,590 - INFO - val_auc_max (0.930974 --> 0.933111). Saving model ...
+2020-10-15 05:54:02,591 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 05:54:02,736 - INFO - Wed Oct 14 20:54:02 2020 Epoch:11
+2020-10-15 06:03:58,114 - INFO - Wed Oct 14 21:03:58 2020 Fold 3, Epoch 11, lr: 0.0002000, train loss: 0.16138, valid loss: 0.15844, acc: 91.2188, val_auc: 0.932271, val_auc_20: 0.875802.
+2020-10-15 06:03:58,117 - INFO - val_auc_20_max (0.872308 --> 0.875802). Saving model ...
+2020-10-15 06:03:58,118 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold3_1.pth
+2020-10-15 06:03:58,265 - INFO - ====================Fold4====================
+2020-10-15 06:03:58,486 - INFO - device_GPU_True:True
+2020-10-15 06:03:58,498 - INFO - Wed Oct 14 21:03:58 2020 Epoch:0
+2020-10-15 06:14:02,257 - INFO - Wed Oct 14 21:14:02 2020 Fold 4, Epoch 0, lr: 0.0010000, train loss: 0.21732, valid loss: 0.20177, acc: 91.2181, val_auc: 0.897157, val_auc_20: 0.776066.
+2020-10-15 06:14:02,258 - INFO - val_auc_max (0.000000 --> 0.897157). Saving model ...
+2020-10-15 06:14:02,259 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:14:02,400 - INFO - val_auc_20_max (0.000000 --> 0.776066). Saving model ...
+2020-10-15 06:14:02,402 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:14:02,532 - INFO - Wed Oct 14 21:14:02 2020 Epoch:1
+2020-10-15 06:24:05,210 - INFO - Wed Oct 14 21:24:05 2020 Fold 4, Epoch 1, lr: 0.0010000, train loss: 0.20163, valid loss: 0.21902, acc: 91.2181, val_auc: 0.899028, val_auc_20: 0.814418.
+2020-10-15 06:24:05,211 - INFO - val_auc_max (0.897157 --> 0.899028). Saving model ...
+2020-10-15 06:24:05,212 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:24:05,364 - INFO - val_auc_20_max (0.776066 --> 0.814418). Saving model ...
+2020-10-15 06:24:05,366 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:24:05,503 - INFO - Wed Oct 14 21:24:05 2020 Epoch:2
+2020-10-15 06:34:05,310 - INFO - Wed Oct 14 21:34:05 2020 Fold 4, Epoch 2, lr: 0.0010000, train loss: 0.19673, valid loss: 0.19104, acc: 91.2181, val_auc: 0.913309, val_auc_20: 0.835639.
+2020-10-15 06:34:05,311 - INFO - val_auc_max (0.899028 --> 0.913309). Saving model ...
+2020-10-15 06:34:05,312 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:34:05,480 - INFO - val_auc_20_max (0.814418 --> 0.835639). Saving model ...
+2020-10-15 06:34:05,482 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:34:05,625 - INFO - Wed Oct 14 21:34:05 2020 Epoch:3
+2020-10-15 06:44:13,017 - INFO - Wed Oct 14 21:44:13 2020 Fold 4, Epoch 3, lr: 0.0010000, train loss: 0.19497, valid loss: 0.18709, acc: 91.2181, val_auc: 0.911381, val_auc_20: 0.826829.
+2020-10-15 06:44:13,019 - INFO - Wed Oct 14 21:44:13 2020 Epoch:4
+2020-10-15 06:54:18,200 - INFO - Wed Oct 14 21:54:18 2020 Fold 4, Epoch 4, lr: 0.0010000, train loss: 0.19079, valid loss: 0.18156, acc: 91.2181, val_auc: 0.916106, val_auc_20: 0.825626.
+2020-10-15 06:54:18,201 - INFO - val_auc_max (0.913309 --> 0.916106). Saving model ...
+2020-10-15 06:54:18,202 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 06:54:18,352 - INFO - Wed Oct 14 21:54:18 2020 Epoch:5
+2020-10-15 07:04:23,151 - INFO - Wed Oct 14 22:04:23 2020 Fold 4, Epoch 5, lr: 0.0010000, train loss: 0.18828, valid loss: 0.16676, acc: 91.2181, val_auc: 0.926357, val_auc_20: 0.843879.
+2020-10-15 07:04:23,156 - INFO - val_auc_max (0.916106 --> 0.926357). Saving model ...
+2020-10-15 07:04:23,160 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:04:23,327 - INFO - val_auc_20_max (0.835639 --> 0.843879). Saving model ...
+2020-10-15 07:04:23,328 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:04:23,487 - INFO - Wed Oct 14 22:04:23 2020 Epoch:6
+2020-10-15 07:14:29,308 - INFO - Wed Oct 14 22:14:29 2020 Fold 4, Epoch 6, lr: 0.0010000, train loss: 0.18575, valid loss: 0.16666, acc: 91.2181, val_auc: 0.926225, val_auc_20: 0.837239.
+2020-10-15 07:14:29,310 - INFO - Wed Oct 14 22:14:29 2020 Epoch:7
+2020-10-15 07:24:45,724 - INFO - Wed Oct 14 22:24:45 2020 Fold 4, Epoch 7, lr: 0.0010000, train loss: 0.18423, valid loss: 0.17347, acc: 91.2181, val_auc: 0.926329, val_auc_20: 0.851969.
+2020-10-15 07:24:45,726 - INFO - val_auc_20_max (0.843879 --> 0.851969). Saving model ...
+2020-10-15 07:24:45,727 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:24:45,897 - INFO - Wed Oct 14 22:24:45 2020 Epoch:8
+2020-10-15 07:34:49,243 - INFO - Wed Oct 14 22:34:49 2020 Fold 4, Epoch 8, lr: 0.0002000, train loss: 0.17361, valid loss: 0.15742, acc: 91.2181, val_auc: 0.934059, val_auc_20: 0.866147.
+2020-10-15 07:34:49,244 - INFO - val_auc_max (0.926357 --> 0.934059). Saving model ...
+2020-10-15 07:34:49,245 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:34:49,398 - INFO - val_auc_20_max (0.851969 --> 0.866147). Saving model ...
+2020-10-15 07:34:49,400 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:34:49,536 - INFO - Wed Oct 14 22:34:49 2020 Epoch:9
+2020-10-15 07:44:55,482 - INFO - Wed Oct 14 22:44:55 2020 Fold 4, Epoch 9, lr: 0.0002000, train loss: 0.16878, valid loss: 0.15303, acc: 91.2181, val_auc: 0.939343, val_auc_20: 0.876135.
+2020-10-15 07:44:55,483 - INFO - val_auc_max (0.934059 --> 0.939343). Saving model ...
+2020-10-15 07:44:55,484 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:44:55,636 - INFO - val_auc_20_max (0.866147 --> 0.876135). Saving model ...
+2020-10-15 07:44:55,638 - INFO - save_path=/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampTrue_ver1_fold4_1.pth
+2020-10-15 07:44:55,781 - INFO - Wed Oct 14 22:44:55 2020 Epoch:10
+2020-10-15 07:55:03,568 - INFO - Wed Oct 14 22:55:03 2020 Fold 4, Epoch 10, lr: 0.0002000, train loss: 0.16607, valid loss: 0.15455, acc: 91.2181, val_auc: 0.939069, val_auc_20: 0.874530.
+2020-10-15 07:55:03,569 - INFO - Wed Oct 14 22:55:03 2020 Epoch:11
+2020-10-15 08:05:14,843 - INFO - Wed Oct 14 23:05:14 2020 Fold 4, Epoch 11, lr: 0.0002000, train loss: 0.16309, valid loss: 0.15380, acc: 91.2181, val_auc: 0.938403, val_auc_20: 0.874355.
+2020-10-15 08:05:14,844 - INFO - train_finish
