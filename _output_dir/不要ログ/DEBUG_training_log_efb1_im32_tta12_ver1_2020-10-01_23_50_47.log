@@ -1,0 +1,30 @@
+2020-10-01 23:50:47,455 - INFO - logger set up
+2020-10-01 23:50:47,456 - INFO - #####Print_Config######
+2020-10-01 23:50:47,457 - INFO - DEBUG:True
+2020-10-01 23:50:47,457 - INFO - image_size:32
+2020-10-01 23:50:47,457 - INFO - epochs:1
+2020-10-01 23:50:47,457 - INFO - es_patience:3
+2020-10-01 23:50:47,457 - INFO - batch_size:32
+2020-10-01 23:50:47,458 - INFO - num_workers:8
+2020-10-01 23:50:47,458 - INFO - kfold:2
+2020-10-01 23:50:47,458 - INFO - b_num:b1
+2020-10-01 23:50:47,458 - INFO - train_aug,val_aug:FalseFalse
+2020-10-01 23:50:47,458 - INFO - --------path----------
+2020-10-01 23:50:47,458 - INFO - model_name:efb1_im32_tta2_ver1
+2020-10-01 23:50:47,459 - INFO - model_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/DEBUG_:False
+2020-10-01 23:50:47,459 - INFO - predict_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/DEBUG_:False
+2020-10-01 23:50:47,460 - INFO - oof_path:/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/DEBUG_:False
+2020-10-01 23:50:47,460 - INFO - #########DEBUG-MODE#############
+2020-10-01 23:50:47,460 - INFO - model_path:True
+2020-10-01 23:50:47,460 - INFO - oof_path:True
+2020-10-01 23:50:47,461 - INFO - predict_path:True
+2020-10-01 23:50:47,461 - INFO - #####END######
+2020-10-01 23:50:47,682 - INFO - device_CPU_GPU:cuda
+2020-10-01 23:50:55,359 - INFO - ====================Fold0====================
+2020-10-01 23:50:55,360 - INFO - criterion:BCEWithLogitsLoss()
+2020-10-01 23:50:55,565 - INFO - device_GPU_True:True
+2020-10-01 23:53:04,569 - INFO - Epoch 001: | Loss: 69.642 | Train acc: 0.969 | Val acc: 0.982 | Val roc_auc: 0.449 | Training time: 0:02:08
+2020-10-01 23:53:30,454 - INFO - ====================Fold1====================
+2020-10-01 23:53:30,455 - INFO - criterion:BCEWithLogitsLoss()
+2020-10-01 23:53:30,764 - INFO - device_GPU_True:True
+2020-10-01 23:55:44,666 - INFO - Epoch 001: | Loss: 62.454 | Train acc: 0.972 | Val acc: 0.982 | Val roc_auc: 0.776 | Training time: 0:02:13

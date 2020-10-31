@@ -1,4 +1,4 @@
-#フォルダ及び中身は要らない
+#フォルダ及び中身は要らないa
 __pycache__/
 .ipynb_checkpoints/
 _output_dir/

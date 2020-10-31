@@ -1,0 +1,8 @@
+・画面の輝度
+・夜間モード
+・Aaの切り替え
+・outlook⇒メールテンプレ
+・ブラウザ⇒chrome規定値
+・カレンダー
+・付箋、sniiping_tool
+・画面はじで拡大⇒https://hamachan.info/win10/win/aero.html
