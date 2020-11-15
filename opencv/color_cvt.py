@@ -2,6 +2,66 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 
+def read_img(image_path,alpha_ch=True):
+  img = cv2.imread(image_path)
+  img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+  plt.imshow(img)
+  if alpha_ch:
+    img_alpha = cv2.imread(image_path,-1)
+    print("透過画像", img_alpha.shape)
+    alpha_ch = img_alpha[:,:,3]
+    #同じこと3つ、
+    # alpha_ch = img_alpha.reshape(img_alpha.shape[0],img_alpha.shape[1],1)
+    # alpha_ch = img_alpha[:,:,np.newaxis]
+    alpha_ch = np.expand_dims(alpha_ch,axis=2)
+    return img, alpha_ch
+  else:
+    return img
+
+#HSV回転(x,y=分割段数)
+def hsv_rotation(img,alpha_ch,x=4,y=4):
+  image_list=[]
+  xy = x*y
+  plt.figure(figsize=(x*5,y*5))
+  for i in range(xy):
+    ang = int(i*(180//xy))
+    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+    hsv = hsv.astype(np.uint16) 
+    hsv[:,:,0] = (hsv[:,:,0]+ang)%180
+    hsv = hsv.astype(np.uint8) # 型を戻す
+    dst = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+    plt.subplot(x,y,i+1)
+    plt.title("image_num:{}".format(i))
+    plt.imshow(dst)
+    dst = np.concatenate([dst, alpha_ch], axis=2)
+    image_list.append(dst)
+  return image_list
+
+# #彩度明度調整(x,y=分割段数)
+# def s_rotation(img,alpha_ch,x=0.1,y=2.1):
+#   image_list=[]
+#   plt.figure(figsize=(20,20))
+#   s_magnification = np.arange(x, y, 0.1)
+#   temp = img.copy()
+#   for i in range(len(s_magnification)):
+#     hsv = cv2.cvtColor(temp, cv2.COLOR_RGB2HSV)
+
+#     # hsv[:,:,1] = hsv[:,:,1]*s_magnification[i]  # 彩度の計算
+#     hsv[:,:,(2)] = hsv[:,:,(2)]*s_magnification[i]  # 明度の計算
+    
+#     hsv = hsv.astype(np.uint16) 
+#     # hsv[hsv[:,:,1]>=255]=255
+#     hsv[hsv[:,:,2]>=255]=255
+#     hsv = hsv.astype(np.uint8) # 型を戻す
+
+#     dst = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+#     plt.subplot(5,4,i+1)
+#     plt.title("image_num:{}".format(i))
+#     plt.imshow(dst)
+#     dst = np.concatenate([dst, alpha_ch], axis=2)
+#     image_list.append(dst)
+#   return image_list
+
 
 def chromakey(img,rgb="G"):
   color = 1
@@ -28,7 +88,7 @@ def cut_roi(img,xy=[200, 400, 400, 500],thickness=2):
   rgb_list = [roi[:,:,0],roi[:,:,1],roi[:,:,2]]
   median_list = [int(np.median(rgb_list[0])),int(np.median(rgb_list[1])),int(np.median(rgb_list[2]))]
   print("r_median",median_list[0],"g_median",median_list[1],"b_median",median_list[2])
-  print(roi.shape,rgb_list[0].shape)
+  print("roi.shape",roi.shape)
 
   #追加処理_黒部分を除いたmedianの取得
   plt.subplot(1,3,3)
@@ -43,15 +103,10 @@ def cut_roi(img,xy=[200, 400, 400, 500],thickness=2):
 
 
 
-def roi_cvt(roi,rgb_list, median_list,plus_list, r_up=55,r_down=55,g_up=55,g_down=55,b_up=55,b_down=55):
+def roi_cvt(roi,rgb_list, median_list,plus_list, updown_list=[55,55,55,55,55,55]):
   r,g,b = rgb_list[0],rgb_list[1],rgb_list[2]
   new_roi = roi.copy()
-  r_up = r_up 
-  r_down = r_down
-  g_up = g_up
-  g_down = g_down
-  b_up = b_up
-  b_down = b_down
+  r_up, r_down, g_up, g_down, b_up, b_down = updown_list[0], updown_list[1], updown_list[2], updown_list[3], updown_list[4], updown_list[5]
 
   index = (
   ((r <= median_list[0]+r_up)&(r >= median_list[0] - r_down))
@@ -81,7 +136,8 @@ def color_plot(color_list):
   plt.title("R{}_G{}_B{}".format(r,g,b))
   plt.imshow(temp)
 
-def median_plot_2(median_list, r_up,r_down,g_up,g_down, b_up,b_down):
+def median_plot_2(median_list, updown_list):
+  r_up, r_down, g_up, g_down, b_up, b_down = updown_list[0], updown_list[1], updown_list[2], updown_list[3], updown_list[4], updown_list[5]
   r_list = [median_list[0],median_list[0]+r_up,median_list[0]-r_down]
   g_list = [median_list[1],median_list[1]+g_up,median_list[1]-g_down]
   b_list = [median_list[2],median_list[2]+b_up,median_list[2]-b_down]
@@ -103,10 +159,10 @@ def dropper(median_list,drop_color):
       plus = median_list[i] - drop_color[i]
       plus *= -1
     else:
-      print("else")
       plus = drop_color[i] - median_list[i] 
     plus_list.append(plus)
   print("plus_list", plus_list)
+  color_plot(drop_color)
   return plus_list
 
 def layer_to_img(img,alpha_ch,layers,output_path):
@@ -121,4 +177,4 @@ def layer_to_img(img,alpha_ch,layers,output_path):
   cv2.imwrite(output_path,result)
   return result
 
-# from opencv.color_cvt import chromakey, cut_roi, roi_cvt, roi_to_img,color_plot,median_plot_2,dropper, layer_to_img
+# from opencv.color_cvt import read_img, hsv_rotation, chromakey, cut_roi, roi_cvt, roi_to_img,color_plot,median_plot_2,dropper, layer_to_img
