@@ -9,7 +9,7 @@ FILE=".gitignore"
 if [ ! -e $FILE ];then
   echo "gitignoreがないよ"
 fi
-
+echo "gitignoreあるよ！"
 
 #キャッシュの削除
 if [ $1 ]; then
