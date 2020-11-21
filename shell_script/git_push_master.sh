@@ -1,15 +1,23 @@
 #!/usr/bin/bash
 cd "/mnt/d/Google ドライブ/Pipeline"
-source "/mnt/d/Google ドライブ/00Colab Notebooks/00Commands/03SCRIPTkey/github.txt"
 git checkout master
+source "/mnt/d/Google ドライブ/00Colab Notebooks/00Commands/03SCRIPTkey/github.txt"
+
+
 #gitignoreにtxtついてないか注意
+FILE=".gitignore"
+if [ ! -e $FILE ];then
+  echo "gitignoreがないよ"
+fi
+
+
+#キャッシュの削除
 if [ $1 ]; then
   git rm -r --cached .
 fi
 
 git add -A
 git commit -m "script_push"
-
 
 expect -c "
 set timeout 5

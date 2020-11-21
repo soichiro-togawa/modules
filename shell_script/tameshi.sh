@@ -1,7 +1,12 @@
 #!/usr/bin/bash
-STR="backup"
-TIME="`date +%Y%m%d_%H%M%S`"
-FILE="$STR"_"$TIME"
-echo "$FILE" 
+cd "/mnt/d/Google ドライブ/Pipeline"
 
+FILE=".gitignore"
+ 
+if [ ! -e $FILE ]; then
+  echo "File exists."
+  exit
+fi
+
+echo "tameshi"
 # "/mnt/d/Google ドライブ/Pipeline/shell_script/tameshi.sh"
