@@ -8,6 +8,7 @@ source "/mnt/d/Google ドライブ/00Colab Notebooks/00Commands/03SCRIPTkey/gith
 FILE=".gitignore"
 if [ ! -e $FILE ];then
   echo "gitignoreがないよ"
+  exit
 fi
 echo "gitignoreあるよ！"
 
