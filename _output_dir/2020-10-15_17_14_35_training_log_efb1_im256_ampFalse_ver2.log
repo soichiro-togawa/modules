@@ -1,0 +1,17 @@
+2020-10-15 17:14:35,707 - INFO - logger set up
+2020-10-15 17:14:35,708 - INFO - #####Print_Config######
+2020-10-15 17:14:35,710 - INFO - {'image_name': 'image_name', 'target': 'target', 'extension': '.jpg', 'use_meta': True, 'use_external': True}
+2020-10-15 17:14:35,711 - INFO - {'b_num': 'b1', 'out_features': 9, 'criterion': CrossEntropyLoss(), 'device': device(type='cuda'), 'use_meta': True}
+2020-10-15 17:14:35,712 - INFO - {'DEBUG': False, 'USE_AMP': False, 'image_size': 256, 'epochs': 12, 'es_patience': 3, 'batch_size': 64, 'num_workers': 8, 'kfold': 5, 'fold_list': [2, 3, 4], 'train_aug': True, 'val_aug': False, 'test_aug': False, 'n_val': 8, 'TTA': 8, 'use_meta': True, 'target': 'target', 'out_features': 9, 'criterion': CrossEntropyLoss(), 'device': device(type='cuda')}
+2020-10-15 17:14:35,713 - INFO - ----------------path------------------
+2020-10-15 17:14:35,716 - INFO - {'df_train_preprocessed_path': '/content/df_train.csv', 'df_test_preprocessed_path': '/content/df_test.csv', 'VERSION': 2, 'model_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/model/efb1_im256_ampFalse_ver2', 'oof_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/OOF_efb1_im256_ampFalse_ver2.csv', 'predict_path': '/content/drive/My Drive/00Colab Notebooks/11Kaggle/melanoma/sub_3/PREDICT_efb1_im256_ampFalse_ver2.csv', 'LOG_DIR': '/content/drive/My Drive/Pipeline/output_dir/', 'model_name': 'efb1_im256_ampFalse_ver2', 'LOG_NAME': 'training_log_efb1_im256_ampFalse_ver2'}
+2020-10-15 17:14:35,718 - INFO - model_path_exist:True
+2020-10-15 17:14:35,719 - INFO - oof_path_exist:True
+2020-10-15 17:14:35,721 - INFO - predict_path_exist:True
+2020-10-15 17:14:35,722 - INFO - LOG_DIR_exist:True
+2020-10-15 17:14:35,723 - INFO - #####END######
+2020-10-15 17:14:35,725 - INFO - Fold0はスキップされました
+2020-10-15 17:14:35,726 - INFO - Fold1はスキップされました
+2020-10-15 17:14:35,728 - INFO - ====================Fold2====================
+2020-10-15 17:14:48,301 - INFO - device_GPU_True:True
+2020-10-15 17:14:48,305 - INFO - Thu Oct 15 08:14:48 2020 Epoch:0
