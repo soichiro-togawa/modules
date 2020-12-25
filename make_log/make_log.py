@@ -3,7 +3,7 @@ import datetime
 from pytz import timezone
 import os,sys
 
-# LOG_DIR = ""
+# LOG_DIR = "./_output_dir"
 
 def setup_logger(LOG_DIR, FILE_NAME=None, stderr=True, stderr_level=logging.INFO, file_level=logging.DEBUG):
     # print("ログセットアップ、ログファイルの生成")
