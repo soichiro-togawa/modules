@@ -1,0 +1,5 @@
+#https://qiita.com/lain21/items/a33a39d465cd08b662f1
+
+gcloud compute ssh --zone us-east1-d "tameshi-vm" -- -N -f -L 28888:localhost:8888
+
+gcloud compute ssh --zone us-central1-a "instance-1"

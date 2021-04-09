@@ -1,0 +1,21 @@
+#######dockerfileの前段階の準備########
+<0>
+gpuインスタンスを作成(p2.xlarge, osはubuntu)
+ssh接続後、
+
+<1>dockerのインストール
+sudo apt-get update
+sudo apt-get install docker.io
+sudo gpasswd -a ubuntu docker  #dockerグループにユーザーを追加→以後sudoが不要になる
+docker --version  #19.3以降はnvidia-dockerが不要になった
+
+<2>nvidia-driverのインスタンスへのインストール(インスタンスとgpuの接続)
+gpuのタイプに合わせたdriverをダウンロードする
+https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#abstract
+nvidia-quick-start-guideの通りにいれる
+nvidia-smi #インストール確認
+
+<3>nvidia-container-toolkitのインストール(dockerとgpuの接続、docker使わないときはホスト(インスタンス)にいれる)
+https://github.com/NVIDIA/nvidia-docker
+installationguide.の通りに入れる
+docker run --gpus all nvidia/cuda:9.0-base nvidia-smi #インストール確認、cudaのbaseバージョンは適宜
